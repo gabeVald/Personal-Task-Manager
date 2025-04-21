@@ -6,6 +6,8 @@ from passlib.context import CryptContext
 
 from auth.jwt_auth import Token, TokenData, create_access_token, decode_jwt_token
 from models.user import User, UserRequest
+from models.log import Log
+from datetime import datetime
 
 pwd_context = CryptContext(schemes=["bcrypt"])
 
@@ -53,6 +55,17 @@ async def sign_up(user: UserRequest):
             role="user",
         )
     await new_user.create()
+
+    # Log the signup action
+    now = datetime.now()
+    newLog = Log(
+        username=user.username,
+        endpoint="signup",
+        time=now,
+        details={"email": user.email, "role": new_user.role},
+    )
+    await Log.insert_one(newLog)
+
     return {"message": "User created successfully", "user": new_user}
 
 
@@ -76,6 +89,132 @@ async def login_for_access_token(
     )
     if authenticated:
         access_token = create_access_token({"username": username})
+
+        # Log the successful login
+        now = datetime.now()
+        newLog = Log(
+            username=username,
+            endpoint="sign-in",
+            time=now,
+            details={"action": "successful_login"},
+        )
+        await Log.insert_one(newLog)
+
         return Token(access_token=access_token)
 
+    # Log the failed login attempt
+    now = datetime.now()
+    newLog = Log(
+        username=username,
+        endpoint="sign-in",
+        time=now,
+        details={"action": "failed_login_attempt"},
+    )
+    await Log.insert_one(newLog)
+
     return HTTPException(status_code=401, detail="Username or Password is not valid.")
+
+
+@user_router.post("/logout")
+async def logout(current_user: Annotated[TokenData, Depends(get_user)]):
+    # Log the logout action for auditing purposes
+
+    now = datetime.now()
+    newLog = Log(
+        username=current_user.username,
+        endpoint="logout",
+        time=now,
+        details={"action": "user_logout"},
+    )
+    await Log.insert_one(newLog)
+
+    return {"message": "Logged out successfully"}
+
+
+# Admin-only endpoints for user management
+@user_router.get("/all")
+async def get_all_users(current_user: Annotated[TokenData, Depends(get_user)]):
+    # Verify the user is an admin
+    user = await User.find_one(User.username == current_user.username)
+    if not user or user.role != "admin":
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Admin privileges required",
+        )
+
+    # Log the admin action
+    now = datetime.now()
+    newLog = Log(
+        username=current_user.username,
+        endpoint="get_all_users",
+        time=now,
+        details={"action": "admin_view_all_users"},
+    )
+    await Log.insert_one(newLog)
+
+    # Fetch all users without returning password hashes
+    all_users = await User.find_all().to_list()
+    # Remove password field from response
+    users_response = []
+    for user in all_users:
+        user_dict = user.dict()
+        del user_dict["password"]
+        users_response.append(user_dict)
+
+    return users_response
+
+
+@user_router.patch("/{username}/role")
+async def update_user_role(
+    username: str,
+    role: str,
+    current_user: Annotated[TokenData, Depends(get_user)],
+):
+    # Verify the user is an admin
+    admin = await User.find_one(User.username == current_user.username)
+    if not admin or admin.role != "admin":
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Admin privileges required",
+        )
+
+    # Validate role
+    if role not in ["user", "admin"]:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Invalid role. Must be 'user' or 'admin'",
+        )
+
+    # Find the user to update
+    user_to_update = await User.find_one(User.username == username)
+    if not user_to_update:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="User not found",
+        )
+
+    # Don't allow admins to downgrade themselves
+    if username == current_user.username and role != "admin":
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Admins cannot downgrade their own role",
+        )
+
+    # Update the role
+    user_to_update.role = role
+    await user_to_update.save()
+
+    # Log the admin action
+    now = datetime.now()
+    newLog = Log(
+        username=current_user.username,
+        endpoint="update_user_role",
+        time=now,
+        details={
+            "target_user": username,
+            "new_role": role,
+        },
+    )
+    await Log.insert_one(newLog)
+
+    return {"message": f"User {username} role updated to {role}"}

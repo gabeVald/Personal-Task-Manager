@@ -17,6 +17,7 @@ class Task(Document):
     high_priority: bool = False
     level: str = "task"
     username: str
+    has_image: bool = False
 
     class Settings:
         name = "tasks"
@@ -34,3 +35,4 @@ class TaskRequest(BaseModel):
     completed_date: datetime = datetime(year=44, month=3, day=15)
     high_priority: bool = False
     level: str = "task"
+    has_image: bool = False

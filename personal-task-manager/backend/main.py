@@ -11,6 +11,8 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from routers.task_router import task_router
 from routers.user_router import user_router
+from routers.file_router import file_router
+from routers.log_router import log_router
 
 # to auto load the database
 
@@ -30,6 +32,8 @@ app = FastAPI(Title="Class todo App Demo", version="2.0.0", lifespan=lifespan)
 
 app.include_router(task_router, tags=["Todos"], prefix="/todos")
 app.include_router(user_router, tags=["Users"], prefix="/users")
+app.include_router(file_router, tags=["Files"], prefix="/todos/files")
+app.include_router(log_router, tags=["Logs"], prefix="/logs")
 
 app.add_middleware(CORSMiddleware)
 

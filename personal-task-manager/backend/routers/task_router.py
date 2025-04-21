@@ -128,6 +128,7 @@ async def create_task(
         high_priority=task.high_priority,
         level=task.level,
         username=current_user.username,
+        has_image=task.has_image,
     )
     now = datetime.now()
     newLog = Log(
