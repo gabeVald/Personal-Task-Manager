@@ -34,7 +34,7 @@ export default function LoginPage() {
                             Keep track of your daily tasks, todos, and important
                             items in one place.
                         </p>
-                        <Link href="/">
+                        <Link href="https://github.com/gabeVald/Personal-Task-Manager/">
                             <Button>GitHub Repo</Button>
                         </Link>
                     </div>
