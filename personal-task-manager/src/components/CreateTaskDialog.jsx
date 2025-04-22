@@ -149,7 +149,7 @@ export function CreateTaskDialog({ onTaskCreated }) {
             <DialogTrigger asChild>
                 <Button variant="ghost" className="justify-start gap-1">
                     <PlusCircle className="h-4 w-4" />
-                    Create Task
+                    Task
                 </Button>
             </DialogTrigger>
             <DialogContent className="sm:max-w-[525px]">

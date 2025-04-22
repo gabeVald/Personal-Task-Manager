@@ -270,7 +270,10 @@ export default function Home() {
                         </div>
                     </div>
                 </PopoverTrigger>
-                <PopoverContent className="w-40" align="end">
+                <PopoverContent
+                    className="w-40 flex items-center justify-center"
+                    align="end"
+                >
                     <div className="flex flex-col space-y-2">
                         <CreateTaskDialog onTaskCreated={fetchTasks} />
                         <Separator />

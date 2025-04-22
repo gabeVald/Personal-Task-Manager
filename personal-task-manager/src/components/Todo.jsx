@@ -132,6 +132,7 @@ function TaskPopover({
     const [isEditing, setIsEditing] = useState(false);
     const [taskFiles, setTaskFiles] = useState([]);
     const [loading, setLoading] = useState(false);
+    const [datesPopoverOpen, setDatesPopoverOpen] = useState(false);
 
     // Simple notification function to replace toast
     const showNotification = (message) => {
@@ -411,8 +412,11 @@ function TaskPopover({
                     )}
 
                     <div className="flex items-center justify-between">
-                        <HoverCard>
-                            <HoverCardTrigger asChild>
+                        <Popover
+                            open={datesPopoverOpen}
+                            onOpenChange={setDatesPopoverOpen}
+                        >
+                            <PopoverTrigger asChild>
                                 <Button
                                     variant="ghost"
                                     size="sm"
@@ -421,8 +425,8 @@ function TaskPopover({
                                     <Calendar className="h-4 w-4" />
                                     Dates
                                 </Button>
-                            </HoverCardTrigger>
-                            <HoverCardContent className="w-80">
+                            </PopoverTrigger>
+                            <PopoverContent className="w-80">
                                 <div className="grid gap-2">
                                     <div className="flex justify-between">
                                         <span className="font-medium">
@@ -462,8 +466,8 @@ function TaskPopover({
                                         </div>
                                     )}
                                 </div>
-                            </HoverCardContent>
-                        </HoverCard>
+                            </PopoverContent>
+                        </Popover>
 
                         <div className="text-sm text-muted-foreground">
                             Level:{" "}
@@ -494,7 +498,10 @@ function TaskPopover({
                             <Carousel className="w-full max-w-sm mx-auto">
                                 <CarouselContent>
                                     {taskFiles.map((file, index) => (
-                                        <CarouselItem key={file.id || index}>
+                                        <CarouselItem
+                                            key={file.id || index}
+                                            className="flex items-center justify-center"
+                                        >
                                             <div className="p-1">
                                                 <Card>
                                                     <CardContent className="flex aspect-square items-center justify-center p-6">

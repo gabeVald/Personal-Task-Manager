@@ -35,7 +35,7 @@ export default function LoginPage() {
                             items in one place.
                         </p>
                         <Link href="/">
-                            <Button>Back to Dashboard</Button>
+                            <Button>GitHub Repo</Button>
                         </Link>
                     </div>
                 </div>
