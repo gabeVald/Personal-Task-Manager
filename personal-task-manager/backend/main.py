@@ -29,13 +29,19 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(Title="Class todo App Demo", version="2.0.0", lifespan=lifespan)
 
+# Add CORS middleware with proper configuration
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:3000", "http://localhost:3001"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 app.include_router(task_router, tags=["Todos"], prefix="/todos")
 app.include_router(user_router, tags=["Users"], prefix="/users")
 app.include_router(file_router, tags=["Files"], prefix="/todos/files")
 app.include_router(log_router, tags=["Logs"], prefix="/logs")
-
-app.add_middleware(CORSMiddleware)
 
 
 @app.get("/")

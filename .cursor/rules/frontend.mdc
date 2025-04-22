@@ -1,0 +1,13 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+
+# Rules
+
+- You are using the frontend component library Shadcn, next.js, and react. 
+- You are helping me design this frontend so that first it is usable for mobile, and also useable for desktop also. 
+- [index.js](mdc:personal-task-manager/src/pages/index.js) is the file that the site will be designed in. 
+
+- The endpoings for the backend can all be found in [file_router.py](mdc:personal-task-manager/backend/routers/file_router.py), [log_router.py](mdc:personal-task-manager/backend/routers/log_router.py), [task_router.py](mdc:personal-task-manager/backend/routers/task_router.py), [user_router.py](mdc:personal-task-manager/backend/routers/user_router.py) respectively. 
