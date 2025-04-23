@@ -27,7 +27,7 @@ async def get_all(current_user: Annotated[TokenData, Depends(get_user)]) -> list
         details={"action": "get_all_tasks"},
     )
     await Log.insert_one(newLog)
-    return await Task.find(Task.username == current_user.username).to_list()
+    return await Task.find(Task.username == current_user.username, Task.completed == False).to_list()
 
 
 # Get tasks
@@ -42,7 +42,7 @@ async def get_tasks(current_user: Annotated[TokenData, Depends(get_user)]) -> li
     )
     await Log.insert_one(newLog)
     return await Task.find(
-        Task.level == "task", Task.username == current_user.username
+        Task.level == "task", Task.username == current_user.username, Task.completed == False
     ).to_list()
 
 
@@ -58,7 +58,7 @@ async def get_todos(current_user: Annotated[TokenData, Depends(get_user)]) -> li
     )
     await Log.insert_one(newLog)
     return await Task.find(
-        Task.level == "todo", Task.username == current_user.username
+        Task.level == "todo", Task.username == current_user.username, Task.completed == False
     ).to_list()
 
 
@@ -74,7 +74,7 @@ async def get_gottados(current_user: Annotated[TokenData, Depends(get_user)]) ->
     )
     await Log.insert_one(newLog)
     return await Task.find(
-        Task.level == "gottado", Task.username == current_user.username
+        Task.level == "gottado", Task.username == current_user.username, Task.completed == False
     ).to_list()
 
 
@@ -110,12 +110,15 @@ async def create_task(
 ) -> Task:
 
     # Depending on type of task, set the expired_date (when you would need to re-evaluate its category)
-    if task.level == "task":
-        expired_date = task.created_date + timedelta(days=1)
-    elif task.level == "todo":
-        expired_date = task.created_date + timedelta(days=7)
-    elif task.level == "gottado":
-        expired_date = task.created_date + timedelta(days=30)
+    if not task.expired_date:
+        if task.level == "task":
+            expired_date = task.created_date + timedelta(days=1)
+        elif task.level == "todo":
+            expired_date = task.created_date + timedelta(days=7)
+        elif task.level == "gottado":
+            expired_date = task.created_date + timedelta(days=30)
+    else:
+        expired_date = task.expired_date
 
     newTask = Task(
         description=task.description,

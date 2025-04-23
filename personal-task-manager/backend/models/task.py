@@ -31,6 +31,7 @@ class TaskRequest(BaseModel):
     completed: bool = False
     # When the task was initially created
     created_date: datetime
+    expired_date: datetime
     # When the completed boolean flips from 0 -> 1, ides of march as placeholder
     completed_date: datetime = datetime(year=44, month=3, day=15)
     high_priority: bool = False
