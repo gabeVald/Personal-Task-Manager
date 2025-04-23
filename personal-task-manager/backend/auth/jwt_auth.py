@@ -19,7 +19,7 @@ class TokenData(BaseModel):
 ALGORITHM = "HS256"
 
 
-def create_access_token(data: dict, expires_delta: timedelta = timedelta(minutes=15)):
+def create_access_token(data: dict, expires_delta: timedelta = timedelta(minutes=60)):
     payload = data.copy()
     # if we have anything for expires_delta, set the expire time to be now + delta
     expire = datetime.now(timezone.utc) + expires_delta

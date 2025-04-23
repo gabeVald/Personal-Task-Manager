@@ -10,7 +10,55 @@ import { CreateTaskDialog } from "@/components/CreateTaskDialog";
 import { useRouter } from "next/router";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { ToastProvider } from "@/components/ui/toast";
+import { UserListDialog } from "@/components/UserListDialog";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { Toaster } from "@/components/ui/toaster";
+
+// Function to decode JWT token
+const decodeJWT = (token) => {
+    try {
+        const base64Url = token.split(".")[1];
+        const base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/");
+        const jsonPayload = decodeURIComponent(
+            atob(base64)
+                .split("")
+                .map(function (c) {
+                    return "%" + ("00" + c.charCodeAt(0).toString(16)).slice(-2);
+                })
+                .join("")
+        );
+        return JSON.parse(jsonPayload);
+    } catch (error) {
+        console.error("Error decoding token:", error);
+        return null;
+    }
+};
+
+// Function to set up token expiration timer
+const setupExpirationTimer = (token, router) => {
+    const decodedToken = decodeJWT(token);
+    if (!decodedToken) {
+        localStorage.removeItem("token");
+        router.push("/");
+        return null;
+    }
+
+    const expirationTime = decodedToken.exp * 1000; // Convert to milliseconds
+    const currentTime = Date.now();
+    const timeUntilExpiration = expirationTime - currentTime;
+    const redirectTime = timeUntilExpiration - 60000; // Redirect 1 minute before expiration
+
+    if (redirectTime <= 0) {
+        localStorage.removeItem("token");
+        router.push("/");
+        return null;
+    }
+
+    return setTimeout(() => {
+        localStorage.removeItem("token");
+        router.push("/");
+    }, redirectTime);
+};
 
 const geistSans = Geist({
     variable: "--font-geist-sans",
@@ -29,7 +77,19 @@ export default function Home() {
     const [gottados, setGottados] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const [isAdmin, setIsAdmin] = useState(false);
     const router = useRouter();
+
+    // Check if user is admin
+    useEffect(() => {
+        const token = localStorage.getItem("token");
+        if (token) {
+            const decodedToken = decodeJWT(token);
+            if (decodedToken && decodedToken.role === "admin") {
+                setIsAdmin(true);
+            }
+        }
+    }, []);
 
     // Function to fetch all tasks data
     const fetchTasks = async () => {
@@ -52,7 +112,7 @@ export default function Home() {
                 // If unauthorized, redirect to login
                 if (allResponse.status === 401) {
                     localStorage.removeItem("token");
-                    router.push("/login");
+                    router.push("/");
                     return;
                 }
                 throw new Error(`Error fetching tasks: ${allResponse.statusText}`);
@@ -108,16 +168,24 @@ export default function Home() {
         // Check if user is authenticated
         const token = localStorage.getItem("token");
         if (!token) {
-            router.push("/login");
+            router.push("/");
             return;
         }
 
+        // Set up single expiration timer
+        const timerHandle = setupExpirationTimer(token, router);
+
         fetchTasks();
+
+        // Cleanup timer on component unmount
+        return () => {
+            if (timerHandle) clearTimeout(timerHandle);
+        };
     }, [router]);
 
     const handleLogout = () => {
         localStorage.removeItem("token");
-        router.push("/login");
+        router.push("/");
     };
 
     // Add this function to handle moving tasks
@@ -305,6 +373,12 @@ export default function Home() {
                 <PopoverContent className="w-40 flex items-center justify-center" align="end">
                     <div className="flex flex-col space-y-2">
                         <CreateTaskDialog onTaskCreated={fetchTasks} />
+                        {isAdmin && (
+                            <>
+                                <Separator />
+                                <UserListDialog />
+                            </>
+                        )}
                         <Separator />
                         <Button variant="ghost" className="justify-start" onClick={handleLogout}>
                             Logout
@@ -312,6 +386,9 @@ export default function Home() {
                     </div>
                 </PopoverContent>
             </Popover>
+
+            {/* Toast notifications */}
+            <Toaster />
         </div>
     );
 }

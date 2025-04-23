@@ -27,7 +27,7 @@ async def lifespan(app: FastAPI):
     print("Application Shuts down")  # not currently implemented
 
 
-app = FastAPI(Title="Class todo App Demo", version="2.0.0", lifespan=lifespan)
+app = FastAPI(Title="", version="2.0.0", lifespan=lifespan)
 
 # Add CORS middleware with proper configuration
 app.add_middleware(

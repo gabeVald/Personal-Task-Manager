@@ -26,7 +26,14 @@ hash_password = HashPassword()
 
 def get_user(token: Annotated[str, Depends(oauth2_scheme)]) -> TokenData:
     print(token)
-    return decode_jwt_token(token)
+    token_data = decode_jwt_token(token)
+    if not token_data:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Could not validate credentials",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+    return token_data
 
 
 user_router = APIRouter()
@@ -88,8 +95,8 @@ async def login_for_access_token(
         form_data.password, existing_user.password
     )
     if authenticated:
-        access_token = create_access_token({"username": username})
-
+        role = existing_user.role
+        access_token = create_access_token({"username": username, "role": role})
         # Log the successful login
         now = datetime.now()
         newLog = Log(
@@ -99,7 +106,6 @@ async def login_for_access_token(
             details={"action": "successful_login"},
         )
         await Log.insert_one(newLog)
-
         return Token(access_token=access_token)
 
     # Log the failed login attempt
@@ -218,3 +224,39 @@ async def update_user_role(
     await Log.insert_one(newLog)
 
     return {"message": f"User {username} role updated to {role}"}
+
+
+@user_router.delete("/{username}")
+async def delete_user(
+    username: str,
+    current_user: Annotated[TokenData, Depends(get_user)],
+):
+    # Verify the user is an admin
+    admin = await User.find_one(User.username == current_user.username)
+    if not admin or admin.role != "admin":
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Admin privileges required",
+        )
+
+    # Find the user to delete
+    user_to_delete = await User.find_one(User.username == username)
+    if not user_to_delete:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="User not found",
+        )
+
+    # Log the admin action
+    now = datetime.now()
+    newLog = Log(
+        username=current_user.username,
+        endpoint="delete_user_role",
+        time=now,
+        details={
+            "target_user": username,
+        },
+    )
+    await Log.insert_one(newLog)
+
+    return {"message": f"User {username} deleted."}

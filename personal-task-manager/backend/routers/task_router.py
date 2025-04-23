@@ -27,7 +27,9 @@ async def get_all(current_user: Annotated[TokenData, Depends(get_user)]) -> list
         details={"action": "get_all_tasks"},
     )
     await Log.insert_one(newLog)
-    return await Task.find(Task.username == current_user.username, Task.completed == False).to_list()
+    return await Task.find(
+        Task.username == current_user.username, Task.completed == False
+    ).to_list()
 
 
 # Get tasks
@@ -42,7 +44,9 @@ async def get_tasks(current_user: Annotated[TokenData, Depends(get_user)]) -> li
     )
     await Log.insert_one(newLog)
     return await Task.find(
-        Task.level == "task", Task.username == current_user.username, Task.completed == False
+        Task.level == "task",
+        Task.username == current_user.username,
+        Task.completed == False,
     ).to_list()
 
 
@@ -58,7 +62,9 @@ async def get_todos(current_user: Annotated[TokenData, Depends(get_user)]) -> li
     )
     await Log.insert_one(newLog)
     return await Task.find(
-        Task.level == "todo", Task.username == current_user.username, Task.completed == False
+        Task.level == "todo",
+        Task.username == current_user.username,
+        Task.completed == False,
     ).to_list()
 
 
@@ -74,7 +80,9 @@ async def get_gottados(current_user: Annotated[TokenData, Depends(get_user)]) ->
     )
     await Log.insert_one(newLog)
     return await Task.find(
-        Task.level == "gottado", Task.username == current_user.username, Task.completed == False
+        Task.level == "gottado",
+        Task.username == current_user.username,
+        Task.completed == False,
     ).to_list()
 
 

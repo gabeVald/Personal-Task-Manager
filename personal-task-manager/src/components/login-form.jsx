@@ -3,33 +3,12 @@ import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import {
-    Card,
-    CardContent,
-    CardDescription,
-    CardFooter,
-    CardHeader,
-    CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
-import {
-    Form,
-    FormControl,
-    FormField,
-    FormItem,
-    FormLabel,
-    FormMessage,
-} from "@/components/ui/form";
-import {
-    Dialog,
-    DialogContent,
-    DialogDescription,
-    DialogHeader,
-    DialogTitle,
-    DialogTrigger,
-} from "@/components/ui/dialog";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { useToast } from "@/components/ui/use-toast";
 import { useRouter } from "next/router";
 
@@ -80,16 +59,13 @@ export function LoginForm({ className, ...props }) {
             formData.append("username", values.username);
             formData.append("password", values.password);
 
-            const response = await fetch(
-                "http://localhost:8000/users/sign-in",
-                {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/x-www-form-urlencoded",
-                    },
-                    body: formData,
-                }
-            );
+            const response = await fetch("http://localhost:8000/users/sign-in", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/x-www-form-urlencoded",
+                },
+                body: formData,
+            });
 
             if (!response.ok) {
                 const errorData = await response.json();
@@ -107,14 +83,12 @@ export function LoginForm({ className, ...props }) {
             });
 
             // Redirect to the dashboard
-            router.push("/");
+            router.push("/dashboard");
         } catch (error) {
             console.error("Login failed:", error);
             toast({
                 title: "Login failed",
-                description:
-                    error.message ||
-                    "Please check your credentials and try again",
+                description: error.message || "Please check your credentials and try again",
                 variant: "destructive",
             });
         } finally {
@@ -147,8 +121,7 @@ export function LoginForm({ className, ...props }) {
 
             toast({
                 title: "Account created",
-                description:
-                    "Your account has been created successfully. You can now log in.",
+                description: "Your account has been created successfully. You can now log in.",
             });
 
             setDialogOpen(false);
@@ -157,9 +130,7 @@ export function LoginForm({ className, ...props }) {
             console.error("Signup failed:", error);
             toast({
                 title: "Signup failed",
-                description:
-                    error.message ||
-                    "Please try again with different credentials",
+                description: error.message || "Please try again with different credentials",
                 variant: "destructive",
             });
         } finally {
@@ -171,16 +142,11 @@ export function LoginForm({ className, ...props }) {
         <Card className="w-full">
             <CardHeader className="space-y-1">
                 <CardTitle className="text-2xl font-bold">Login</CardTitle>
-                <CardDescription>
-                    Enter your username to login to your account
-                </CardDescription>
+                <CardDescription>Enter your username to login to your account</CardDescription>
             </CardHeader>
             <CardContent>
                 <Form {...form}>
-                    <form
-                        onSubmit={form.handleSubmit(handleSubmit)}
-                        className={cn("grid gap-4", className)}
-                    >
+                    <form onSubmit={form.handleSubmit(handleSubmit)} className={cn("grid gap-4", className)}>
                         <FormField
                             control={form.control}
                             name="username"
@@ -188,12 +154,7 @@ export function LoginForm({ className, ...props }) {
                                 <FormItem>
                                     <FormLabel>Username</FormLabel>
                                     <FormControl>
-                                        <Input
-                                            type="text"
-                                            placeholder=""
-                                            {...field}
-                                            disabled={isLoading}
-                                        />
+                                        <Input type="text" placeholder="" {...field} disabled={isLoading} />
                                     </FormControl>
                                     <FormMessage />
                                 </FormItem>
@@ -206,21 +167,13 @@ export function LoginForm({ className, ...props }) {
                                 <FormItem>
                                     <FormLabel>Password</FormLabel>
                                     <FormControl>
-                                        <Input
-                                            type="password"
-                                            {...field}
-                                            disabled={isLoading}
-                                        />
+                                        <Input type="password" {...field} disabled={isLoading} />
                                     </FormControl>
                                     <FormMessage />
                                 </FormItem>
                             )}
                         />
-                        <Button
-                            type="submit"
-                            className="w-full"
-                            disabled={isLoading}
-                        >
+                        <Button type="submit" className="w-full" disabled={isLoading}>
                             {isLoading ? "Logging in..." : "Login"}
                         </Button>
                     </form>
@@ -231,9 +184,7 @@ export function LoginForm({ className, ...props }) {
                         <span className="w-full border-t"></span>
                     </div>
                     <div className="relative flex justify-center text-xs uppercase">
-                        <span className="bg-background px-2 text-muted-foreground">
-                            Don't have an account?
-                        </span>
+                        <span className="bg-background px-2 text-muted-foreground">Don't have an account?</span>
                     </div>
                 </div>
                 <div className="mt-4 grid gap-2">
@@ -246,17 +197,10 @@ export function LoginForm({ className, ...props }) {
                         <DialogContent className="sm:max-w-[425px]">
                             <DialogHeader>
                                 <DialogTitle>Create a new account</DialogTitle>
-                                <DialogDescription>
-                                    Fill in your details to create an account
-                                </DialogDescription>
+                                <DialogDescription>Fill in your details to create an account</DialogDescription>
                             </DialogHeader>
                             <Form {...signupForm}>
-                                <form
-                                    onSubmit={signupForm.handleSubmit(
-                                        handleSignupSubmit
-                                    )}
-                                    className="space-y-4 py-4"
-                                >
+                                <form onSubmit={signupForm.handleSubmit(handleSignupSubmit)} className="space-y-4 py-4">
                                     <FormField
                                         control={signupForm.control}
                                         name="username"
@@ -264,11 +208,7 @@ export function LoginForm({ className, ...props }) {
                                             <FormItem>
                                                 <FormLabel>Username</FormLabel>
                                                 <FormControl>
-                                                    <Input
-                                                        placeholder="johndoe"
-                                                        {...field}
-                                                        disabled={isLoading}
-                                                    />
+                                                    <Input placeholder="johndoe" {...field} disabled={isLoading} />
                                                 </FormControl>
                                                 <FormMessage />
                                             </FormItem>
@@ -281,12 +221,7 @@ export function LoginForm({ className, ...props }) {
                                             <FormItem>
                                                 <FormLabel>Email</FormLabel>
                                                 <FormControl>
-                                                    <Input
-                                                        placeholder="example@email.com"
-                                                        type="email"
-                                                        {...field}
-                                                        disabled={isLoading}
-                                                    />
+                                                    <Input placeholder="example@email.com" type="email" {...field} disabled={isLoading} />
                                                 </FormControl>
                                                 <FormMessage />
                                             </FormItem>
@@ -299,24 +234,14 @@ export function LoginForm({ className, ...props }) {
                                             <FormItem>
                                                 <FormLabel>Password</FormLabel>
                                                 <FormControl>
-                                                    <Input
-                                                        type="password"
-                                                        {...field}
-                                                        disabled={isLoading}
-                                                    />
+                                                    <Input type="password" {...field} disabled={isLoading} />
                                                 </FormControl>
                                                 <FormMessage />
                                             </FormItem>
                                         )}
                                     />
-                                    <Button
-                                        type="submit"
-                                        className="w-full"
-                                        disabled={isLoading}
-                                    >
-                                        {isLoading
-                                            ? "Creating..."
-                                            : "Create Account"}
+                                    <Button type="submit" className="w-full" disabled={isLoading}>
+                                        {isLoading ? "Creating..." : "Create Account"}
                                     </Button>
                                 </form>
                             </Form>
