@@ -1,13 +1,55 @@
 import { useState, useEffect } from "react";
-import { Check, ChevronsUpDown, Copy, Save, Trash2, AlertTriangle } from "lucide-react";
+import {
+    Check,
+    ChevronsUpDown,
+    Copy,
+    Save,
+    Trash2,
+    AlertTriangle,
+} from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogDescription, DialogFooter } from "@/components/ui/dialog";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import {
+    Command,
+    CommandEmpty,
+    CommandGroup,
+    CommandInput,
+    CommandItem,
+    CommandList,
+} from "@/components/ui/command";
+import {
+    Dialog,
+    DialogContent,
+    DialogHeader,
+    DialogTitle,
+    DialogTrigger,
+    DialogDescription,
+    DialogFooter,
+} from "@/components/ui/dialog";
+import {
+    Popover,
+    PopoverContent,
+    PopoverTrigger,
+} from "@/components/ui/popover";
 import { useToast } from "@/components/ui/use-toast";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "@/components/ui/select";
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+    AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import { Separator } from "@/components/ui/separator";
 
 export function UserListDialog() {
@@ -49,7 +91,8 @@ export function UserListDialog() {
             console.error("Error fetching users:", error);
             toast({
                 title: "Error",
-                description: "Failed to load users. You may not have permission.",
+                description:
+                    "Failed to load users. You may not have permission.",
                 variant: "destructive",
             });
         } finally {
@@ -66,7 +109,9 @@ export function UserListDialog() {
     // Set user role when selecting a user
     useEffect(() => {
         if (selectedUser) {
-            const selectedUserData = users.find((user) => user.value === selectedUser);
+            const selectedUserData = users.find(
+                (user) => user.value === selectedUser
+            );
             if (selectedUserData) {
                 setUserRole(selectedUserData.role);
             }
@@ -99,17 +144,23 @@ export function UserListDialog() {
         try {
             setLoadingAction(true);
             const token = localStorage.getItem("token");
-            const response = await fetch(`http://127.0.0.1:8000/users/${selectedUser}/role?role=${userRole}`, {
-                method: "PATCH",
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                    "Content-Type": "application/json",
-                },
-            });
+            const response = await fetch(
+                `http://127.0.0.1:8000/users/${selectedUser}/role?role=${userRole}`,
+                {
+                    method: "PATCH",
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                        "Content-Type": "application/json",
+                    },
+                }
+            );
 
             if (!response.ok) {
                 const errorData = await response.json();
-                throw new Error(errorData.detail || `Error updating role: ${response.statusText}`);
+                throw new Error(
+                    errorData.detail ||
+                        `Error updating role: ${response.statusText}`
+                );
             }
 
             const data = await response.json();
@@ -119,7 +170,13 @@ export function UserListDialog() {
             });
 
             // Update local state to reflect the change
-            setUsers((prev) => prev.map((user) => (user.value === selectedUser ? { ...user, role: userRole } : user)));
+            setUsers((prev) =>
+                prev.map((user) =>
+                    user.value === selectedUser
+                        ? { ...user, role: userRole }
+                        : user
+                )
+            );
         } catch (error) {
             console.error("Error updating role:", error);
             toast({
@@ -138,17 +195,23 @@ export function UserListDialog() {
         try {
             setLoadingAction(true);
             const token = localStorage.getItem("token");
-            const response = await fetch(`http://127.0.0.1:8000/users/${selectedUser}`, {
-                method: "DELETE",
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                    "Content-Type": "application/json",
-                },
-            });
+            const response = await fetch(
+                `http://127.0.0.1:8000/users/${selectedUser}`,
+                {
+                    method: "DELETE",
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                        "Content-Type": "application/json",
+                    },
+                }
+            );
 
             if (!response.ok) {
                 const errorData = await response.json();
-                throw new Error(errorData.detail || `Error deleting user: ${response.statusText}`);
+                throw new Error(
+                    errorData.detail ||
+                        `Error deleting user: ${response.statusText}`
+                );
             }
 
             const data = await response.json();
@@ -158,7 +221,9 @@ export function UserListDialog() {
             });
 
             // Update local state to remove the deleted user
-            setUsers((prev) => prev.filter((user) => user.value !== selectedUser));
+            setUsers((prev) =>
+                prev.filter((user) => user.value !== selectedUser)
+            );
             // Reset selection
             setSelectedUser("");
             setUserRole("");
@@ -184,14 +249,25 @@ export function UserListDialog() {
             <DialogContent className="sm:max-w-md">
                 <DialogHeader>
                     <DialogTitle>Manage Users</DialogTitle>
-                    <DialogDescription>View, edit roles, and manage user accounts.</DialogDescription>
+                    <DialogDescription>
+                        View, edit roles, and manage user accounts.
+                    </DialogDescription>
                 </DialogHeader>
 
                 <div className="flex flex-col space-y-4">
                     <Popover open={popoverOpen} onOpenChange={setPopoverOpen}>
                         <PopoverTrigger asChild>
-                            <Button variant="outline" role="combobox" aria-expanded={popoverOpen} className="w-full justify-between">
-                                {selectedUser ? users.find((user) => user.value === selectedUser)?.label : "Select user..."}
+                            <Button
+                                variant="outline"
+                                role="combobox"
+                                aria-expanded={popoverOpen}
+                                className="w-full justify-between"
+                            >
+                                {selectedUser
+                                    ? users.find(
+                                          (user) => user.value === selectedUser
+                                      )?.label
+                                    : "Select user..."}
                                 <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                             </Button>
                         </PopoverTrigger>
@@ -206,18 +282,28 @@ export function UserListDialog() {
                                                 key={user.value}
                                                 value={user.value}
                                                 onSelect={(currentValue) => {
-                                                    if (currentValue !== selectedUser) {
-                                                        setSelectedUser(currentValue);
-                                                        copyToClipboard(currentValue);
-                                                    } else {
-                                                        setSelectedUser("");
-                                                    }
+                                                    setSelectedUser(
+                                                        currentValue ===
+                                                            selectedUser
+                                                            ? ""
+                                                            : currentValue
+                                                    );
                                                     setPopoverOpen(false);
                                                 }}
                                             >
-                                                <Check className={cn("mr-2 h-4 w-4", selectedUser === user.value ? "opacity-100" : "opacity-0")} />
+                                                <Check
+                                                    className={cn(
+                                                        "mr-2 h-4 w-4",
+                                                        selectedUser ===
+                                                            user.value
+                                                            ? "opacity-100"
+                                                            : "opacity-0"
+                                                    )}
+                                                />
                                                 <span>{user.label}</span>
-                                                <span className="ml-auto text-xs text-muted-foreground">{user.role}</span>
+                                                <span className="ml-auto text-xs text-muted-foreground">
+                                                    {user.role}
+                                                </span>
                                             </CommandItem>
                                         ))}
                                     </CommandGroup>
@@ -228,21 +314,47 @@ export function UserListDialog() {
 
                     {selectedUser && (
                         <>
-                            <div className="flex items-center gap-2 mt-2"></div>
+                            <div className="flex items-center gap-2 mt-2">
+                                <Button
+                                    variant="outline"
+                                    size="sm"
+                                    className="w-full mt-2 flex items-center gap-2"
+                                    onClick={() =>
+                                        copyToClipboard(selectedUser)
+                                    }
+                                >
+                                    <Copy className="h-4 w-4" />
+                                    Copy Username
+                                </Button>
+                            </div>
 
                             <div className="space-y-2">
-                                <div className="text-sm font-medium">User Role</div>
-                                <Select value={userRole} onValueChange={setUserRole}>
+                                <div className="text-sm font-medium">
+                                    User Role
+                                </div>
+                                <Select
+                                    value={userRole}
+                                    onValueChange={setUserRole}
+                                >
                                     <SelectTrigger className="w-full">
                                         <SelectValue placeholder="Select role" />
                                     </SelectTrigger>
                                     <SelectContent>
-                                        <SelectItem value="user">User</SelectItem>
-                                        <SelectItem value="admin">Admin</SelectItem>
+                                        <SelectItem value="user">
+                                            User
+                                        </SelectItem>
+                                        <SelectItem value="admin">
+                                            Admin
+                                        </SelectItem>
                                     </SelectContent>
                                 </Select>
 
-                                <Button variant="outline" className="w-full mt-2 flex items-center gap-2" onClick={handleUpdateRole} disabled={loadingAction}>
+                                <Button
+                                    variant="outline"
+                                    className="w-full mt-2 flex items-center gap-2"
+                                    onClick={handleUpdateRole}
+                                    disabled={loadingAction}
+                                >
                                     <Save className="h-4 w-4" />
                                     Save Role
                                 </Button>
@@ -252,19 +364,33 @@ export function UserListDialog() {
 
                             <AlertDialog>
                                 <AlertDialogTrigger asChild>
-                                    <Button variant="destructive" className="w-full flex items-center gap-2">
+                                    <Button
+                                        variant="destructive"
+                                        className="w-full flex items-center gap-2"
+                                    >
                                         <Trash2 className="h-4 w-4" />
                                         Delete User
                                     </Button>
                                 </AlertDialogTrigger>
                                 <AlertDialogContent>
                                     <AlertDialogHeader>
-                                        <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
-                                        <AlertDialogDescription>This action cannot be undone. This will permanently delete the user account and all associated data.</AlertDialogDescription>
+                                        <AlertDialogTitle>
+                                            Are you absolutely sure?
+                                        </AlertDialogTitle>
+                                        <AlertDialogDescription>
+                                            This action cannot be undone. This
+                                            will permanently delete the user
+                                            account and all associated data.
+                                        </AlertDialogDescription>
                                     </AlertDialogHeader>
                                     <AlertDialogFooter>
-                                        <AlertDialogCancel>Cancel</AlertDialogCancel>
-                                        <AlertDialogAction onClick={handleDeleteUser} className="bg-destructive text-destructive-foreground">
+                                        <AlertDialogCancel>
+                                            Cancel
+                                        </AlertDialogCancel>
+                                        <AlertDialogAction
+                                            onClick={handleDeleteUser}
+                                            className="bg-destructive text-destructive-foreground"
+                                        >
                                             <div className="flex items-center gap-2">
                                                 <AlertTriangle className="h-4 w-4" />
                                                 Delete

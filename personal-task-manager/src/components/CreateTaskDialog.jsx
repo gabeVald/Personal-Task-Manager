@@ -147,7 +147,10 @@ export function CreateTaskDialog({ onTaskCreated }) {
     return (
         <Dialog open={dialogOpen} onOpenChange={handleOpenChange}>
             <DialogTrigger asChild>
-                <Button variant="ghost" className="justify-start gap-1">
+                <Button
+                    variant="ghost"
+                    className=" w-full mt-2 flex items-center gap-2"
+                >
                     <PlusCircle className="h-4 w-4" />
                     Task
                 </Button>
