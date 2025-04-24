@@ -9,6 +9,9 @@ from models.file import File
 from motor.motor_asyncio import AsyncIOMotorClient
 import certifi
 import ssl
+import logging
+
+logger = logging.getLogger("__name__")
 
 
 async def init_database():
@@ -19,3 +22,4 @@ async def init_database():
     client = AsyncIOMotorClient(my_config.connection_string, tlsCAFile=certifi.where())
     db = client["gottaDo_app"]
     await init_beanie(database=db, document_models=[User, Task, Log, File])
+    logger.log("database started")

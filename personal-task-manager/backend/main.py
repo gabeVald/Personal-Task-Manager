@@ -1,5 +1,6 @@
 from contextlib import asynccontextmanager
 from functools import lru_cache
+import logging
 from typing import Annotated
 from fastapi import FastAPI, APIRouter, Path
 from enum import Enum
@@ -14,17 +15,22 @@ from routers.user_router import user_router
 from routers.file_router import file_router
 from routers.log_router import log_router
 
+from logging_setup import setup_logging
+
 # to auto load the database
+
+setup_logging()  # from demo
+logger = logging.getlogger(__name__)
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     # upon startup event
-    print("Application Starts...")
+    logger.info("Application Starts...")
     await init_database()
     # on shutdown
     yield
-    print("Application Shuts down")  # not currently implemented
+    logger.info("Application Shuts down")  # not currently implemented
 
 
 app = FastAPI(Title="", version="2.0.0", lifespan=lifespan)
