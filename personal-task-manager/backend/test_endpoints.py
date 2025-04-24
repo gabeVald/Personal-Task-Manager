@@ -150,6 +150,7 @@ async def test_task_endpoints(token):
                     "tags": ["test", "api", level],
                     "completed": False,
                     "created_date": datetime.now().isoformat(),
+                    "expired_date": datetime.now().isoformat(),
                     "level": level,
                     "high_priority": level == "gottado",  # Make gottados high priority
                 }

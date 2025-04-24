@@ -247,6 +247,8 @@ async def delete_user(
             detail="User not found",
         )
 
+    await user_to_delete.delete()
+
     # Log the admin action
     now = datetime.now()
     newLog = Log(
