@@ -59,9 +59,9 @@ The login page features:
 -   Form validation with helpful error messages
 -   A link to the GitHub repository
 
-[PLACEHOLDER: Login page desktop screenshot]
+![Desktop Login Interface](images/desktop-login.png)
 
-[PLACEHOLDER: Login page mobile screenshot]
+![Mobile Login Interface](images/mobile-login.png)
 
 #### Authentication Process
 
@@ -98,6 +98,7 @@ Located in the bottom-right corner for easy thumb access on mobile devices, the 
 This placement ensures that crucial actions are always within reach on mobile devices.
 
 [PLACEHOLDER: Hamburger menu mobile screenshot]
+!S[Hamburger](personal-task-manager\images\hamburger-menu.PNG)
 
 ### Task Creation
 
