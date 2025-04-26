@@ -20,7 +20,7 @@ from logging_setup import setup_logging
 # to auto load the database
 
 setup_logging()  # from demo
-logger = logging.getlogger(__name__)
+logger = logging.getLogger(__name__)
 
 
 @asynccontextmanager

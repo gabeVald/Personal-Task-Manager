@@ -22,4 +22,4 @@ async def init_database():
     client = AsyncIOMotorClient(my_config.connection_string, tlsCAFile=certifi.where())
     db = client["gottaDo_app"]
     await init_beanie(database=db, document_models=[User, Task, Log, File])
-    logger.log("database started")
+    logger.info("database started")
