@@ -36,9 +36,9 @@ I chose Shadcn because of how customizable the components are, allowing full con
 
 ### Design Evolution
 
-[PLACEHOLDER: Early sketches of the interface]
+![Desktop Login Interface](images/desktop-login.png)
 
-[PLACEHOLDER: Final design screenshots]
+![Mobile Login Interface](images/mobile-login.png)
 
 ## Frontend
 
@@ -97,8 +97,7 @@ Located in the bottom-right corner for easy thumb access on mobile devices, the 
 
 This placement ensures that crucial actions are always within reach on mobile devices.
 
-[PLACEHOLDER: Hamburger menu mobile screenshot]
-!S[Hamburger](personal-task-manager\images\hamburger-menu.PNG)
+![Hamburger Menu](images/hamburger-menu.PNG)
 
 ### Task Creation
 
@@ -113,11 +112,11 @@ Features include:
 -   Priority toggle
 -   File attachment functionality for supporting documents or images
 
-[PLACEHOLDER: Task creation dialog desktop screenshot]
+![Task Creation Desktop](images/create-task-desktop.png)
 
-[PLACEHOLDER: Task creation dialog mobile screenshot]
+![Task Creation Mobile](images/create-task-mobile.png)
 
-[PLACEHOLDER: Date picker screenshot]
+![Date Picker](images/date-picker.png)
 
 ### Task Display
 
@@ -129,9 +128,9 @@ The main table view provides a clean, minimalist display of tasks, showing only:
 
 This approach ensures a clean UI that communicates essential information at a glance without overwhelming the user.
 
-[PLACEHOLDER: Task table desktop screenshot]
+![Task Table Desktop](images/table-desktop.png)
 
-[PLACEHOLDER: Task table mobile screenshot]
+![Task Table Mobile](images/table-mobile.png)
 
 ### Task Details and Editing
 
@@ -152,9 +151,9 @@ The viewing mode displays:
     -   Deleting the task
     -   Reordering the task in the list
 
-[PLACEHOLDER: Task details view screenshot]
+![Task Details Desktop](images/details-desktop.png)
 
-[PLACEHOLDER: File carousel screenshot]
+![Task Details Mobile](images/details-mobile.png)
 
 #### Editing Mode
 
@@ -167,7 +166,7 @@ When "Edit" is clicked, the view transforms to allow editing:
 
 The interface maintains the same layout while allowing modifications to these key fields.
 
-[PLACEHOLDER: Task editing screenshot]
+![Task Editing](images/task-edit.png)
 
 ## Backend
 
