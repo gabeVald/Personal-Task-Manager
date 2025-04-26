@@ -34,12 +34,6 @@ I also designed it around my own personal task management strategy, where I brea
 
 I chose Shadcn because of how customizable the components are, allowing full control and modification from existing components.
 
-### Design Evolution
-
-![Desktop Login Interface](images/desktop-login.png)
-
-![Mobile Login Interface](images/mobile-login.png)
-
 ## Frontend
 
 ### Shadcn UI
@@ -59,9 +53,9 @@ The login page features:
 -   Form validation with helpful error messages
 -   A link to the GitHub repository
 
-![Desktop Login Interface](images/desktop-login.png)
+![Desktop Login Interface](personal-task-manager/images/desktop-login.png)
 
-![Mobile Login Interface](images/mobile-login.png)
+![Mobile Login Interface](personal-task-manager/images/mobile-login.png)
 
 #### Authentication Process
 
@@ -97,7 +91,7 @@ Located in the bottom-right corner for easy thumb access on mobile devices, the 
 
 This placement ensures that crucial actions are always within reach on mobile devices.
 
-![Hamburger Menu](images/hamburger-menu.PNG)
+![Hamburger Menu](personal-task-manager/images/hamburger-menu.PNG)
 
 ### Task Creation
 
@@ -112,11 +106,11 @@ Features include:
 -   Priority toggle
 -   File attachment functionality for supporting documents or images
 
-![Task Creation Desktop](images/create-task-desktop.png)
+![Task Creation Desktop](personal-task-manager/images/create-task-desktop.png)
 
-![Task Creation Mobile](images/create-task-mobile.png)
+![Task Creation Mobile](personal-task-manager/images/create-task-mobile.png)
 
-![Date Picker](images/date-picker.png)
+![Date Picker](personal-task-manager/images/date-picker.png)
 
 ### Task Display
 
@@ -128,9 +122,9 @@ The main table view provides a clean, minimalist display of tasks, showing only:
 
 This approach ensures a clean UI that communicates essential information at a glance without overwhelming the user.
 
-![Task Table Desktop](images/table-desktop.png)
+![Task Table Desktop](personal-task-manager/images/table-desktop.png)
 
-![Task Table Mobile](images/table-mobile.png)
+![Task Table Mobile](personal-task-manager/images/table-mobile.png)
 
 ### Task Details and Editing
 
@@ -151,9 +145,9 @@ The viewing mode displays:
     -   Deleting the task
     -   Reordering the task in the list
 
-![Task Details Desktop](images/details-desktop.png)
+![Task Details Desktop](personal-task-manager/images/details-desktop.png)
 
-![Task Details Mobile](images/details-mobile.png)
+![Task Details Mobile](personal-task-manager/images/details-mobile.png)
 
 #### Editing Mode
 
@@ -166,7 +160,7 @@ When "Edit" is clicked, the view transforms to allow editing:
 
 The interface maintains the same layout while allowing modifications to these key fields.
 
-![Task Editing](images/task-edit.png)
+![Task Editing](personal-task-manager/images/task-edit.png)
 
 ## Backend
 
