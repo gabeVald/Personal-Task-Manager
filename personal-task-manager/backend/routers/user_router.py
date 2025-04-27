@@ -260,9 +260,13 @@ async def delete_user(
     username: str,
     current_user: Annotated[TokenData, Depends(get_user)],
 ):
+    logger.info(f"User {current_user.username} attempting to delete user: {username}")
     # Verify the user is an admin
     admin = await User.find_one(User.username == current_user.username)
     if not admin or admin.role != "admin":
+        logger.warning(
+            f"User {current_user.username} attempted to delete user without admin privileges"
+        )
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Admin privileges required",
@@ -271,18 +275,32 @@ async def delete_user(
     # Find the user to delete
     user_to_delete = await User.find_one(User.username == username)
     if not user_to_delete:
+        logger.warning(
+            f"Admin {current_user.username} attempted to delete non-existent user: {username}"
+        )
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="User not found",
         )
 
+    # Don't allow admins to delete themselves
+    if username == current_user.username:
+        logger.warning(f"Admin {current_user.username} attempted to delete themselves")
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Admins cannot delete their own account",
+        )
+
     await user_to_delete.delete()
+    logger.info(
+        f"User {username} successfully deleted by admin {current_user.username}"
+    )
 
     # Log the admin action
     now = datetime.now()
     newLog = Log(
         username=current_user.username,
-        endpoint="delete_user_role",
+        endpoint="delete_user",
         time=now,
         details={
             "target_user": username,
