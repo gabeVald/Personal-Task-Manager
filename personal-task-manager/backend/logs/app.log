@@ -7,3 +7,44 @@
 2025-04-26 20:17:53,774 INFO __name__ 25 database started
 2025-04-27 09:39:40,076 INFO main 29 Application Starts...
 2025-04-27 09:39:42,071 INFO __name__ 25 database started
+2025-04-27 09:45:22,770 INFO main 29 Application Starts...
+2025-04-27 09:45:24,828 INFO __name__ 25 database started
+2025-04-27 09:45:40,471 INFO routers.user_router 91 Sign-in attempt for username: gabe
+2025-04-27 09:50:29,167 INFO main 29 Application Starts...
+2025-04-27 09:50:30,906 INFO __name__ 25 database started
+2025-04-27 09:50:52,276 INFO routers.user_router 91 Sign-in attempt for username: gabe
+2025-04-27 09:50:52,604 INFO routers.user_router 108 User gabe logged in successfully
+2025-04-27 09:50:56,206 INFO routers.task_router 26 User gabe retrieving all tasks
+2025-04-27 09:50:56,303 INFO routers.task_router 26 User gabe retrieving all tasks
+2025-04-27 09:50:56,311 INFO routers.task_router 43 User gabe retrieving tasks (level: task)
+2025-04-27 09:50:56,662 INFO routers.task_router 43 User gabe retrieving tasks (level: task)
+2025-04-27 09:50:56,678 INFO routers.task_router 62 User gabe retrieving todos (level: todo)
+2025-04-27 09:50:56,811 INFO routers.task_router 62 User gabe retrieving todos (level: todo)
+2025-04-27 09:50:56,821 INFO routers.task_router 81 User gabe retrieving gottados (level: gottado)
+2025-04-27 09:50:56,937 INFO routers.task_router 81 User gabe retrieving gottados (level: gottado)
+2025-04-27 09:51:02,591 INFO routers.file_router 95 User gabe retrieving files for task 6807c4258b5382004c20f5ed (include_data: True)
+2025-04-27 09:51:02,744 INFO routers.file_router 142 Retrieved 0 files for task 6807c4258b5382004c20f5ed
+2025-04-27 09:51:13,572 INFO routers.file_router 95 User gabe retrieving files for task 6807c4258b5382004c20f5ed (include_data: True)
+2025-04-27 09:51:13,712 INFO routers.file_router 142 Retrieved 0 files for task 6807c4258b5382004c20f5ed
+2025-04-27 09:51:15,816 INFO routers.task_router 26 User gabe retrieving all tasks
+2025-04-27 09:51:15,913 INFO routers.task_router 43 User gabe retrieving tasks (level: task)
+2025-04-27 09:51:16,069 INFO routers.task_router 62 User gabe retrieving todos (level: todo)
+2025-04-27 09:51:16,166 INFO routers.task_router 81 User gabe retrieving gottados (level: gottado)
+2025-04-27 09:52:54,257 INFO routers.task_router 129 User gabe creating new task: Pack items together
+2025-04-27 09:52:54,362 INFO routers.task_router 165 Task created successfully: 680e44c6a3c3d578920d7980
+2025-04-27 09:52:54,370 INFO routers.task_router 26 User gabe retrieving all tasks
+2025-04-27 09:52:54,479 INFO routers.task_router 43 User gabe retrieving tasks (level: task)
+2025-04-27 09:52:54,583 INFO routers.task_router 62 User gabe retrieving todos (level: todo)
+2025-04-27 09:52:54,681 INFO routers.task_router 81 User gabe retrieving gottados (level: gottado)
+2025-04-27 14:22:53,203 INFO routers.user_router 91 Sign-in attempt for username: gabe
+2025-04-27 14:22:53,489 INFO routers.user_router 108 User gabe logged in successfully
+2025-04-27 14:22:53,626 INFO routers.task_router 26 User gabe retrieving all tasks
+2025-04-27 14:22:53,712 INFO routers.task_router 26 User gabe retrieving all tasks
+2025-04-27 14:22:53,723 INFO routers.task_router 43 User gabe retrieving tasks (level: task)
+2025-04-27 14:22:53,818 INFO routers.task_router 43 User gabe retrieving tasks (level: task)
+2025-04-27 14:22:53,824 INFO routers.task_router 62 User gabe retrieving todos (level: todo)
+2025-04-27 14:22:53,917 INFO routers.task_router 62 User gabe retrieving todos (level: todo)
+2025-04-27 14:22:53,921 INFO routers.task_router 81 User gabe retrieving gottados (level: gottado)
+2025-04-27 14:22:54,008 INFO routers.task_router 81 User gabe retrieving gottados (level: gottado)
+2025-04-27 14:30:02,588 INFO routers.file_router 95 User gabe retrieving files for task 6807c4258b5382004c20f5ed (include_data: True)
+2025-04-27 14:30:02,761 INFO routers.file_router 142 Retrieved 0 files for task 6807c4258b5382004c20f5ed
