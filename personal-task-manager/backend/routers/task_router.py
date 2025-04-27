@@ -9,6 +9,10 @@ from models.log import Log
 from auth.jwt_auth import TokenData
 from routers.user_router import get_user
 from datetime import datetime
+import logging
+
+# Set up logger
+logger = logging.getLogger(__name__)
 
 task_router = APIRouter()
 
@@ -19,6 +23,7 @@ task_router = APIRouter()
 # Get all task types
 @task_router.get("/all", status_code=status.HTTP_200_OK)
 async def get_all(current_user: Annotated[TokenData, Depends(get_user)]) -> list:
+    logger.info(f"User {current_user.username} retrieving all tasks")
     now = datetime.now()
     newLog = Log(
         username=current_user.username,
@@ -35,6 +40,7 @@ async def get_all(current_user: Annotated[TokenData, Depends(get_user)]) -> list
 # Get tasks
 @task_router.get("/tasks", status_code=status.HTTP_200_OK)
 async def get_tasks(current_user: Annotated[TokenData, Depends(get_user)]) -> list:
+    logger.info(f"User {current_user.username} retrieving tasks (level: task)")
     now = datetime.now()
     newLog = Log(
         username=current_user.username,
@@ -53,6 +59,7 @@ async def get_tasks(current_user: Annotated[TokenData, Depends(get_user)]) -> li
 # Get todos
 @task_router.get("/todos", status_code=status.HTTP_200_OK)
 async def get_todos(current_user: Annotated[TokenData, Depends(get_user)]) -> list:
+    logger.info(f"User {current_user.username} retrieving todos (level: todo)")
     now = datetime.now()
     newLog = Log(
         username=current_user.username,
@@ -71,6 +78,7 @@ async def get_todos(current_user: Annotated[TokenData, Depends(get_user)]) -> li
 # Get gottados
 @task_router.get("/gottados", status_code=status.HTTP_200_OK)
 async def get_gottados(current_user: Annotated[TokenData, Depends(get_user)]) -> list:
+    logger.info(f"User {current_user.username} retrieving gottados (level: gottado)")
     now = datetime.now()
     newLog = Log(
         username=current_user.username,
@@ -89,6 +97,7 @@ async def get_gottados(current_user: Annotated[TokenData, Depends(get_user)]) ->
 # Get completed
 @task_router.get("/completed", status_code=status.HTTP_200_OK)
 async def get_completed(current_user: Annotated[TokenData, Depends(get_user)]) -> dict:
+    logger.info(f"User {current_user.username} retrieving completed tasks")
     now = datetime.now()
     newLog = Log(
         username=current_user.username,
@@ -105,6 +114,7 @@ async def get_completed(current_user: Annotated[TokenData, Depends(get_user)]) -
     if completed_items:
         return {"items": completed_items}
     else:
+        logger.warning(f"User {current_user.username} has no completed tasks")
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail=f"No completed tasks"
         )
@@ -116,6 +126,7 @@ async def get_completed(current_user: Annotated[TokenData, Depends(get_user)]) -
 async def create_task(
     task: TaskRequest, current_user: Annotated[TokenData, Depends(get_user)]
 ) -> Task:
+    logger.info(f"User {current_user.username} creating new {task.level}: {task.title}")
 
     # Depending on type of task, set the expired_date (when you would need to re-evaluate its category)
     if not task.expired_date:
@@ -151,6 +162,7 @@ async def create_task(
 
     await Task.insert_one(newTask)
     await Log.insert_one(newLog)
+    logger.info(f"Task created successfully: {newTask.id}")
     return newTask
 
 
@@ -160,15 +172,20 @@ async def create_task(
 async def delete_task_by_id(
     id: PydanticObjectId, current_user: Annotated[TokenData, Depends(get_user)]
 ) -> dict:
+    logger.info(f"User {current_user.username} attempting to delete task {id}")
     task = await Task.get(id)
 
     if not task:
+        logger.warning(f"Task with ID={id} not found")
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail=f"Item with ID={id} not found"
         )
 
     # Check if the task belongs to the current user
     if task.username != current_user.username:
+        logger.warning(
+            f"User {current_user.username} attempted to delete task {id} belonging to {task.username}"
+        )
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="You don't have permission to delete this task",
@@ -184,6 +201,7 @@ async def delete_task_by_id(
 
     await task.delete()
     await Log.insert_one(newLog)
+    logger.info(f"Task {id} deleted successfully")
     return {"message": f"The todo with ID={id} has been deleted."}
 
 
@@ -195,30 +213,47 @@ async def update_task_title(
     title: Annotated[str, Body(..., min_length=3, max_length=50)],
     current_user: Annotated[TokenData, Depends(get_user)],
 ) -> Task:
+    logger.info(
+        f"User {current_user.username} attempting to update title for task {id}"
+    )
     existing_task = await Task.get(id)
     if not existing_task:
+        logger.warning(f"Task with ID={id} not found")
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail=f"Item with ID={id} not found"
         )
 
     # Check if the task belongs to the current user
     if existing_task.username != current_user.username:
+        logger.warning(
+            f"User {current_user.username} attempted to update task {id} belonging to {existing_task.username}"
+        )
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="You don't have permission to update this task",
         )
 
+    # Save original title for logging
+    original_title = existing_task.title
+
+    # Update the title
+    existing_task.title = title
+    await existing_task.save()
+
+    # Log the update action
     now = datetime.now()
     newLog = Log(
         username=current_user.username,
         endpoint="update_task_title",
         time=now,
-        details={"id": str(id), "old_title": existing_task.title, "new_title": title},
+        details={
+            "id": str(id),
+            "old_title": original_title,
+            "new_title": title,
+        },
     )
-
-    existing_task.title = title
-    await existing_task.save()
     await Log.insert_one(newLog)
+    logger.info(f"Updated title for task {id} from '{original_title}' to '{title}'")
     return existing_task
 
 

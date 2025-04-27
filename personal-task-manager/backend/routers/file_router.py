@@ -21,6 +21,10 @@ from auth.jwt_auth import TokenData
 from routers.user_router import get_user
 from datetime import datetime
 import base64
+import logging
+
+# Set up logger
+logger = logging.getLogger(__name__)
 
 file_router = APIRouter()
 
@@ -34,6 +38,9 @@ async def get_all(
     limit: int = 20,
     include_data: bool = False,
 ) -> list:
+    logger.info(
+        f"User {current_user.username} retrieving all files (include_data: {include_data})"
+    )
     now = datetime.now()
     newLog = Log(
         username=current_user.username,
@@ -74,6 +81,7 @@ async def get_all(
                 # Create a data URL that can be used in img src
                 file.data = f"data:{file.content_type};base64,{base64_data}"
 
+    logger.info(f"Retrieved {len(files)} files for user {current_user.username}")
     return files
 
 
@@ -84,12 +92,18 @@ async def get_files_by_task(
     current_user: Annotated[TokenData, Depends(get_user)],
     include_data: bool = False,
 ) -> list:
+    logger.info(
+        f"User {current_user.username} retrieving files for task {task_id} (include_data: {include_data})"
+    )
     # Convert string ID to PydanticObjectId
     task_obj_id = PydanticObjectId(task_id)
 
     # Verify the task exists and belongs to the user
     task = await Task.get(task_obj_id)
     if not task or task.username != current_user.username:
+        logger.warning(
+            f"Task not found or unauthorized access: {task_id} for user {current_user.username}"
+        )
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Task not found or you don't have permission to access it",
@@ -125,6 +139,7 @@ async def get_files_by_task(
                 base64_data = base64.b64encode(file.data).decode("utf-8")
                 file.data = f"data:{file.content_type};base64,{base64_data}"
 
+    logger.info(f"Retrieved {len(files)} files for task {task_id}")
     return files
 
 
@@ -136,6 +151,7 @@ async def upload_file(
     description: Optional[str] = Form(None),
     task_id: Optional[str] = Form(None),
 ):
+    logger.info(f"User {current_user.username} uploading file: {file.filename}")
     # Read file content
     file_content = await file.read()
     file_size = len(file_content)
@@ -153,16 +169,21 @@ async def upload_file(
 
     # If task_id is provided, verify it exists and belongs to the user
     if task_id:
+        logger.info(f"Associating file with task: {task_id}")
         try:
             task_obj_id = PydanticObjectId(task_id)
             task = await Task.get(task_obj_id)
 
             if not task:
+                logger.warning(f"Task not found: {task_id}")
                 raise HTTPException(
                     status_code=status.HTTP_404_NOT_FOUND, detail="Task not found"
                 )
 
             if task.username != current_user.username:
+                logger.warning(
+                    f"User {current_user.username} attempted to access task {task_id} belonging to {task.username}"
+                )
                 raise HTTPException(
                     status_code=status.HTTP_403_FORBIDDEN,
                     detail="You don't have permission to add files to this task",
@@ -172,12 +193,14 @@ async def upload_file(
             file_doc.task_id = task_obj_id
 
         except ValueError:
+            logger.error(f"Invalid task ID format: {task_id}")
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid task ID format"
             )
 
     # Save the file to the database
     await file_doc.insert()
+    logger.info(f"File uploaded successfully: ID={file_doc.id}, size={file_size} bytes")
 
     # Log the action
     now = datetime.now()
@@ -199,8 +222,9 @@ async def upload_file(
         "filename": file_doc.filename,
         "size": file_doc.size,
         "content_type": file_doc.content_type,
-        "task_id": str(file_doc.task_id) if file_doc.task_id else None,
+        "description": file_doc.description,
         "upload_date": file_doc.upload_date,
+        "task_id": str(file_doc.task_id) if file_doc.task_id else None,
     }
 
 
@@ -210,6 +234,7 @@ async def delete_file(
     file_id: Annotated[str, Path()],
     current_user: Annotated[TokenData, Depends(get_user)],
 ):
+    logger.info(f"User {current_user.username} attempting to delete file: {file_id}")
     try:
         # Convert string ID to PydanticObjectId
         file_obj_id = PydanticObjectId(file_id)
@@ -218,12 +243,16 @@ async def delete_file(
         file = await File.get(file_obj_id)
 
         if not file:
+            logger.warning(f"File not found: {file_id}")
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND, detail="File not found"
             )
 
         # Verify the file belongs to the user
         if file.username != current_user.username:
+            logger.warning(
+                f"User {current_user.username} attempted to delete file {file_id} belonging to {file.username}"
+            )
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
                 detail="You don't have permission to delete this file",
@@ -231,6 +260,7 @@ async def delete_file(
 
         # Delete the file
         await file.delete()
+        logger.info(f"File deleted successfully: {file_id}, filename: {file.filename}")
 
         # Log the action
         now = datetime.now()
@@ -245,6 +275,7 @@ async def delete_file(
         return {"message": "File deleted successfully", "id": file_id}
 
     except ValueError:
+        logger.error(f"Invalid file ID format: {file_id}")
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid file ID format"
         )
