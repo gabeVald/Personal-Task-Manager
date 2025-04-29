@@ -191,6 +191,3 @@ Handles file operations:
 
 Manages system logs and activity tracking.
 
-## Getting Started
-
-[Instructions for setting up and running the project would go here]
