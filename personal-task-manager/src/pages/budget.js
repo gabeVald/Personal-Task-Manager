@@ -15,17 +15,10 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Upload, FileText, DollarSign, TrendingUp, AlertCircle, Calendar } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 import { SpendingDonutChart } from "@/components/SpendingDonutChart";
+import { TopSpendingCategories } from "@/components/TopSpendingCategories";
 
 // Spending categories
-const SPENDING_CATEGORIES = [
-    "Food, Dining & Entertainment",
-    "Auto, Commute & Travel", 
-    "Shopping",
-    "Bills & Subscriptions",
-    "Family & Pets",
-    "Other Expenses",
-    "Health & Personal Care",
-];
+const SPENDING_CATEGORIES = ["Food, Dining & Entertainment", "Auto, Commute & Travel", "Shopping", "Bills & Subscriptions", "Family & Pets", "Other Expenses", "Health & Personal Care"];
 
 // Chart configuration for spending categories
 const chartConfig = {
@@ -37,7 +30,7 @@ const chartConfig = {
         label: "Auto & Travel",
         color: "hsl(var(--chart-2))",
     },
-    "Shopping": {
+    Shopping: {
         label: "Shopping",
         color: "hsl(var(--chart-3))",
     },
@@ -57,7 +50,7 @@ const chartConfig = {
         label: "Health & Care",
         color: "hsl(var(--chart-7))",
     },
-    "Uncategorized": {
+    Uncategorized: {
         label: "Uncategorized",
         color: "hsl(var(--muted))",
     },
@@ -66,7 +59,7 @@ const chartConfig = {
 export default function BudgetPage() {
     const router = useRouter();
     const { toast } = useToast();
-    
+
     // State management
     const [isLoading, setIsLoading] = useState(false);
     const [ofxFiles, setOfxFiles] = useState([]);
@@ -76,6 +69,9 @@ export default function BudgetPage() {
     const [selectedMonth, setSelectedMonth] = useState("");
     const [monthlyIncome, setMonthlyIncome] = useState("");
     const [uploadDialogOpen, setUploadDialogOpen] = useState(false);
+    const [viewMode, setViewMode] = useState("single"); // "single" or "multi"
+    const [startMonth, setStartMonth] = useState("");
+    const [endMonth, setEndMonth] = useState("");
 
     // Check authentication
     useEffect(() => {
@@ -116,10 +112,11 @@ export default function BudgetPage() {
         try {
             let url = "http://127.0.0.1:8000/budget/transactions?";
             const params = new URLSearchParams();
-            
+
             if (category) params.append("category", category);
             if (month) params.append("month", month);
-            
+            params.append("transaction_type", "debit"); // Only show spending (debits)
+
             url += params.toString();
 
             const response = await fetch(url, {
@@ -172,12 +169,41 @@ export default function BudgetPage() {
         }
     };
 
+    // Fetch multi-month spending summary
+    const fetchMultiMonthSummary = async (startMonth, endMonth) => {
+        try {
+            const params = new URLSearchParams();
+            params.append("start_month", startMonth);
+            params.append("end_month", endMonth);
+
+            const response = await fetch(`http://127.0.0.1:8000/budget/summary/multi-month?${params}`, {
+                headers: {
+                    Authorization: `Bearer ${localStorage.getItem("token")}`,
+                },
+            });
+
+            if (!response.ok) {
+                throw new Error("Failed to fetch multi-month summary");
+            }
+
+            const data = await response.json();
+            setSpendingSummary(data);
+        } catch (error) {
+            console.error("Error fetching multi-month summary:", error);
+            toast({
+                title: "Error",
+                description: "Failed to load multi-month summary",
+                variant: "destructive",
+            });
+        }
+    };
+
     // Handle file upload
     const handleFileUpload = async (event) => {
         const file = event.target.files[0];
         if (!file) return;
 
-        if (!file.name.toLowerCase().endsWith('.ofx') && !file.name.toLowerCase().endsWith('.qfx')) {
+        if (!file.name.toLowerCase().endsWith(".ofx") && !file.name.toLowerCase().endsWith(".qfx")) {
             toast({
                 title: "Invalid file type",
                 description: "Please upload an OFX or QFX file",
@@ -214,7 +240,7 @@ export default function BudgetPage() {
             await fetchOFXFiles();
             await fetchSpendingSummary(selectedMonth);
             await fetchTransactions(selectedCategory, selectedMonth);
-            
+
             setUploadDialogOpen(false);
         } catch (error) {
             console.error("Error uploading file:", error);
@@ -312,8 +338,8 @@ export default function BudgetPage() {
         const now = new Date();
         for (let i = 0; i < 12; i++) {
             const date = new Date(now.getFullYear(), now.getMonth() - i, 1);
-            const monthStr = `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}`;
-            const monthLabel = date.toLocaleDateString('en-US', { year: 'numeric', month: 'long' });
+            const monthStr = `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, "0")}`;
+            const monthLabel = date.toLocaleDateString("en-US", { year: "numeric", month: "long" });
             months.push({ value: monthStr, label: monthLabel });
         }
         return months;
@@ -342,19 +368,11 @@ export default function BudgetPage() {
                         <div className="space-y-4">
                             <div>
                                 <Label htmlFor="file">Select OFX/QFX File</Label>
-                                <Input
-                                    id="file"
-                                    type="file"
-                                    accept=".ofx,.qfx"
-                                    onChange={handleFileUpload}
-                                    disabled={isLoading}
-                                />
+                                <Input id="file" type="file" accept=".ofx,.qfx" onChange={handleFileUpload} disabled={isLoading} />
                             </div>
                             <Alert>
                                 <AlertCircle className="h-4 w-4" />
-                                <AlertDescription>
-                                    Upload your bank's OFX or QFX file to automatically parse transactions.
-                                </AlertDescription>
+                                <AlertDescription>Upload your bank's OFX or QFX file to automatically parse transactions.</AlertDescription>
                             </Alert>
                         </div>
                     </DialogContent>
@@ -379,40 +397,126 @@ export default function BudgetPage() {
                             </CardHeader>
                             <CardContent className="space-y-4">
                                 <div className="flex items-center gap-2">
-                                    <Label htmlFor="month">Month:</Label>
-                                    <Select value={selectedMonth} onValueChange={(value) => {
-                                        setSelectedMonth(value);
-                                        fetchSpendingSummary(value);
-                                        fetchTransactions(selectedCategory, value);
-                                    }}>
-                                        <SelectTrigger className="w-48">
-                                            <SelectValue placeholder="Select month" />
+                                    <Label htmlFor="viewMode">View:</Label>
+                                    <Select
+                                        value={viewMode}
+                                        onValueChange={(value) => {
+                                            setViewMode(value);
+                                            if (value === "single") {
+                                                fetchSpendingSummary(selectedMonth);
+                                            } else {
+                                                if (startMonth && endMonth) {
+                                                    fetchMultiMonthSummary(startMonth, endMonth);
+                                                }
+                                            }
+                                        }}
+                                    >
+                                        <SelectTrigger className="w-32">
+                                            <SelectValue placeholder="View mode" />
                                         </SelectTrigger>
                                         <SelectContent>
-                                            {monthOptions.map((month) => (
-                                                <SelectItem key={month.value} value={month.value}>
-                                                    {month.label}
-                                                </SelectItem>
-                                            ))}
+                                            <SelectItem value="single">Single Month</SelectItem>
+                                            <SelectItem value="multi">Multi Month</SelectItem>
                                         </SelectContent>
                                     </Select>
                                 </div>
-                                
+
+                                {viewMode === "single" ? (
+                                    <div className="flex items-center gap-2">
+                                        <Label htmlFor="month">Month:</Label>
+                                        <Select
+                                            value={selectedMonth}
+                                            onValueChange={(value) => {
+                                                setSelectedMonth(value);
+                                                fetchSpendingSummary(value);
+                                                fetchTransactions(selectedCategory, value);
+                                            }}
+                                        >
+                                            <SelectTrigger className="w-48">
+                                                <SelectValue placeholder="Select month" />
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                                {monthOptions.map((month) => (
+                                                    <SelectItem key={month.value} value={month.value}>
+                                                        {month.label}
+                                                    </SelectItem>
+                                                ))}
+                                            </SelectContent>
+                                        </Select>
+                                    </div>
+                                ) : (
+                                    <div className="space-y-2">
+                                        <div className="flex items-center gap-2">
+                                            <Label htmlFor="startMonth">Start Month:</Label>
+                                            <Select
+                                                value={startMonth}
+                                                onValueChange={(value) => {
+                                                    setStartMonth(value);
+                                                    if (endMonth) {
+                                                        fetchMultiMonthSummary(value, endMonth);
+                                                    }
+                                                }}
+                                            >
+                                                <SelectTrigger className="w-48">
+                                                    <SelectValue placeholder="Start month" />
+                                                </SelectTrigger>
+                                                <SelectContent>
+                                                    {monthOptions.map((month) => (
+                                                        <SelectItem key={month.value} value={month.value}>
+                                                            {month.label}
+                                                        </SelectItem>
+                                                    ))}
+                                                </SelectContent>
+                                            </Select>
+                                        </div>
+                                        <div className="flex items-center gap-2">
+                                            <Label htmlFor="endMonth">End Month:</Label>
+                                            <Select
+                                                value={endMonth}
+                                                onValueChange={(value) => {
+                                                    setEndMonth(value);
+                                                    if (startMonth) {
+                                                        fetchMultiMonthSummary(startMonth, value);
+                                                    }
+                                                }}
+                                            >
+                                                <SelectTrigger className="w-48">
+                                                    <SelectValue placeholder="End month" />
+                                                </SelectTrigger>
+                                                <SelectContent>
+                                                    {monthOptions.map((month) => (
+                                                        <SelectItem key={month.value} value={month.value}>
+                                                            {month.label}
+                                                        </SelectItem>
+                                                    ))}
+                                                </SelectContent>
+                                            </Select>
+                                        </div>
+                                    </div>
+                                )}
+
                                 {spendingSummary && (
                                     <div className="space-y-2">
                                         <div className="flex justify-between">
                                             <span className="font-medium">Total Spent:</span>
                                             <span className="text-red-600">${spendingSummary.total_spent.toFixed(2)}</span>
                                         </div>
+                                        {viewMode === "multi" && spendingSummary.monthly_totals && (
+                                            <div className="space-y-1">
+                                                <span className="font-medium text-sm">Monthly Breakdown:</span>
+                                                {Object.entries(spendingSummary.monthly_totals)
+                                                    .sort(([a], [b]) => b.localeCompare(a))
+                                                    .map(([month, data]) => (
+                                                        <div key={month} className="flex justify-between text-sm">
+                                                            <span className="text-muted-foreground">{new Date(month + "-01").toLocaleDateString("en-US", { month: "short", year: "numeric" })}</span>
+                                                            <span className="text-red-600">${data.amount.toFixed(2)}</span>
+                                                        </div>
+                                                    ))}
+                                            </div>
+                                        )}
                                         <div className="flex justify-between">
-                                            <span className="font-medium">Monthly Income:</span>
-                                            <Input
-                                                type="number"
-                                                placeholder="Enter income"
-                                                value={monthlyIncome}
-                                                onChange={(e) => setMonthlyIncome(e.target.value)}
-                                                className="w-32"
-                                            />
+                                            <span className="font-medium">{viewMode === "multi" ? "Total Income:" : "Monthly Income:"}</span>
+                                            <Input type="number" placeholder="Enter income" value={monthlyIncome} onChange={(e) => setMonthlyIncome(e.target.value)} className="w-32" />
                                         </div>
                                         {monthlyIncome && (
                                             <div className="flex justify-between">
@@ -427,7 +531,7 @@ export default function BudgetPage() {
                             </CardContent>
                         </Card>
 
-                        <SpendingDonutChart 
+                        <SpendingDonutChart
                             spendingData={spendingSummary}
                             onCategoryClick={(category) => {
                                 setSelectedCategory(category);
@@ -439,51 +543,27 @@ export default function BudgetPage() {
                         />
                     </div>
 
-                    <Card>
-                        <CardHeader>
-                            <CardTitle className="flex items-center gap-2">
-                                <TrendingUp className="h-5 w-5" />
-                                Top Spending Categories
-                            </CardTitle>
-                        </CardHeader>
-                        <CardContent>
-                            {spendingSummary && spendingSummary.categories.length > 0 ? (
-                                <div className="space-y-3">
-                                    {spendingSummary.categories.slice(0, 5).map((category, index) => (
-                                        <div key={index} className="flex items-center justify-between p-3 border rounded-lg hover:bg-muted/50 cursor-pointer"
-                                             onClick={() => {
-                                                 setSelectedCategory(category.category);
-                                                 fetchTransactions(category.category, selectedMonth);
-                                                 const transactionsTab = document.querySelector('[value="transactions"]');
-                                                 if (transactionsTab) transactionsTab.click();
-                                             }}>
-                                            <div className="flex items-center gap-3">
-                                                <div className="w-4 h-4 rounded-full" style={{ 
-                                                    backgroundColor: chartConfig[category.category]?.color || chartConfig["Uncategorized"].color 
-                                                }} />
-                                                <span className="font-medium">{category.category}</span>
-                                            </div>
-                                            <div className="flex items-center gap-4">
-                                                <span className="text-sm text-muted-foreground">{category.transaction_count} transactions</span>
-                                                <span className="font-medium">${category.total_amount.toFixed(2)}</span>
-                                                <span className="text-sm text-muted-foreground">({category.percentage}%)</span>
-                                            </div>
-                                        </div>
-                                    ))}
-                                </div>
-                            ) : (
-                                <p className="text-muted-foreground text-sm">No spending data available</p>
-                            )}
-                        </CardContent>
-                    </Card>
+                    <TopSpendingCategories
+                        spendingData={spendingSummary}
+                        selectedMonth={selectedMonth}
+                        onCategoryClick={(category) => {
+                            setSelectedCategory(category);
+                            fetchTransactions(category, selectedMonth);
+                            const transactionsTab = document.querySelector('[value="transactions"]');
+                            if (transactionsTab) transactionsTab.click();
+                        }}
+                    />
                 </TabsContent>
 
                 <TabsContent value="transactions" className="space-y-4">
                     <div className="flex items-center gap-4">
-                        <Select value={selectedCategory} onValueChange={(value) => {
-                            setSelectedCategory(value);
-                            fetchTransactions(value, selectedMonth);
-                        }}>
+                        <Select
+                            value={selectedCategory}
+                            onValueChange={(value) => {
+                                setSelectedCategory(value);
+                                fetchTransactions(value, selectedMonth);
+                            }}
+                        >
                             <SelectTrigger className="w-64">
                                 <SelectValue placeholder="Filter by category" />
                             </SelectTrigger>
@@ -501,9 +581,7 @@ export default function BudgetPage() {
                     <Card>
                         <CardHeader>
                             <CardTitle>Transactions</CardTitle>
-                            <CardDescription>
-                                {transactions.length} transactions found
-                            </CardDescription>
+                            <CardDescription>{transactions.length} transactions found</CardDescription>
                         </CardHeader>
                         <CardContent>
                             <Table>
@@ -519,18 +597,11 @@ export default function BudgetPage() {
                                 <TableBody>
                                     {transactions.map((transaction) => (
                                         <TableRow key={transaction._id}>
-                                            <TableCell>
-                                                {new Date(transaction.transaction_date).toLocaleDateString()}
-                                            </TableCell>
+                                            <TableCell>{new Date(transaction.transaction_date).toLocaleDateString()}</TableCell>
                                             <TableCell>{transaction.merchant_payee}</TableCell>
-                                            <TableCell className={transaction.amount < 0 ? "text-red-600" : "text-green-600"}>
-                                                ${Math.abs(transaction.amount).toFixed(2)}
-                                            </TableCell>
+                                            <TableCell className="text-red-600">${Math.abs(transaction.amount).toFixed(2)}</TableCell>
                                             <TableCell>
-                                                <Select
-                                                    value={transaction.category}
-                                                    onValueChange={(value) => updateTransactionCategory(transaction._id, value)}
-                                                >
+                                                <Select value={transaction.category} onValueChange={(value) => updateTransactionCategory(transaction._id, value)}>
                                                     <SelectTrigger className="w-48">
                                                         <SelectValue />
                                                     </SelectTrigger>
@@ -544,11 +615,7 @@ export default function BudgetPage() {
                                                 </Select>
                                             </TableCell>
                                             <TableCell>
-                                                <Button
-                                                    variant="outline"
-                                                    size="sm"
-                                                    onClick={() => updateTransactionCategory(transaction._id, "Uncategorized")}
-                                                >
+                                                <Button variant="outline" size="sm" onClick={() => updateTransactionCategory(transaction._id, "Uncategorized")}>
                                                     Reset
                                                 </Button>
                                             </TableCell>
@@ -567,9 +634,7 @@ export default function BudgetPage() {
                                 <FileText className="h-5 w-5" />
                                 Uploaded OFX Files
                             </CardTitle>
-                            <CardDescription>
-                                Manage your uploaded OFX files
-                            </CardDescription>
+                            <CardDescription>Manage your uploaded OFX files</CardDescription>
                         </CardHeader>
                         <CardContent>
                             <Table>
@@ -586,25 +651,19 @@ export default function BudgetPage() {
                                     {ofxFiles.map((file) => (
                                         <TableRow key={file._id}>
                                             <TableCell>{file.original_filename}</TableCell>
+                                            <TableCell>{new Date(file.upload_date).toLocaleDateString()}</TableCell>
                                             <TableCell>
-                                                {new Date(file.upload_date).toLocaleDateString()}
-                                            </TableCell>
-                                            <TableCell>
-                                                <span className={`px-2 py-1 rounded text-xs ${
-                                                    file.parsed_status === 'success' ? 'bg-green-100 text-green-800' :
-                                                    file.parsed_status === 'error' ? 'bg-red-100 text-red-800' :
-                                                    'bg-yellow-100 text-yellow-800'
-                                                }`}>
+                                                <span
+                                                    className={`px-2 py-1 rounded text-xs ${
+                                                        file.parsed_status === "success" ? "bg-green-100 text-green-800" : file.parsed_status === "error" ? "bg-red-100 text-red-800" : "bg-yellow-100 text-yellow-800"
+                                                    }`}
+                                                >
                                                     {file.parsed_status}
                                                 </span>
                                             </TableCell>
                                             <TableCell>{file.transaction_count}</TableCell>
                                             <TableCell>
-                                                <Button
-                                                    variant="destructive"
-                                                    size="sm"
-                                                    onClick={() => deleteOFXFile(file._id)}
-                                                >
+                                                <Button variant="destructive" size="sm" onClick={() => deleteOFXFile(file._id)}>
                                                     Delete
                                                 </Button>
                                             </TableCell>

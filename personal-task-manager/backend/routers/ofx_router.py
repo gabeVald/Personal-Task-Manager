@@ -276,6 +276,7 @@ async def get_transactions(
     category: Optional[str] = None,
     start_date: Optional[datetime] = None,
     end_date: Optional[datetime] = None,
+    transaction_type: Optional[str] = "debit",  # Default to debit (spending)
 ):
     """Get transactions for the current user with optional filtering"""
     logger.info(f"User {current_user.username} retrieving transactions")
@@ -285,6 +286,9 @@ async def get_transactions(
 
     if category:
         query["category"] = category
+
+    if transaction_type:
+        query["transaction_type"] = transaction_type
 
     if start_date or end_date:
         date_query = {}
@@ -394,7 +398,7 @@ async def get_spending_summary(
         else:
             end_date = datetime(now.year, now.month + 1, 1)
 
-    # Get transactions for the month
+    # Get transactions for the month (only debits - spending)
     transactions = await Transaction.find(
         {
             "username": current_user.username,
@@ -453,3 +457,103 @@ async def get_spending_summary(
         "total_spent": round(total_spent, 2),
         "categories": categories,
     }
+
+
+@ofx_router.get("/summary/multi-month", status_code=status.HTTP_200_OK)
+async def get_multi_month_summary(
+    current_user: Annotated[TokenData, Depends(get_user)],
+    start_month: str,  # YYYY-MM format
+    end_month: str,  # YYYY-MM format
+):
+    """Get spending summary across multiple months"""
+    logger.info(f"User {current_user.username} retrieving multi-month spending summary")
+
+    try:
+        # Parse start and end months
+        start_year, start_month_num = map(int, start_month.split("-"))
+        end_year, end_month_num = map(int, end_month.split("-"))
+
+        # Calculate date range
+        start_date = datetime(start_year, start_month_num, 1)
+        if end_month_num == 12:
+            end_date = datetime(end_year + 1, 1, 1)
+        else:
+            end_date = datetime(end_year, end_month_num + 1, 1)
+
+        # Get transactions for the date range (only debits - spending)
+        transactions = await Transaction.find(
+            {
+                "username": current_user.username,
+                "transaction_date": {"$gte": start_date, "$lt": end_date},
+                "transaction_type": "debit",  # Only count debits (spending)
+            }
+        ).to_list()
+
+        # Calculate category summaries
+        category_totals = {}
+        total_spent = 0
+        monthly_totals = {}
+
+        for tx in transactions:
+            category = tx.category
+            amount = abs(tx.amount)  # Convert to positive for spending
+            month_key = tx.transaction_date.strftime("%Y-%m")
+
+            # Category totals
+            if category not in category_totals:
+                category_totals[category] = {"amount": 0, "count": 0}
+            category_totals[category]["amount"] += amount
+            category_totals[category]["count"] += 1
+            total_spent += amount
+
+            # Monthly totals
+            if month_key not in monthly_totals:
+                monthly_totals[month_key] = {"amount": 0, "count": 0}
+            monthly_totals[month_key]["amount"] += amount
+            monthly_totals[month_key]["count"] += 1
+
+        # Create category summaries
+        categories = []
+        for category, data in category_totals.items():
+            percentage = (data["amount"] / total_spent * 100) if total_spent > 0 else 0
+            categories.append(
+                CategorySummary(
+                    category=category,
+                    total_amount=data["amount"],
+                    transaction_count=data["count"],
+                    percentage=round(percentage, 2),
+                )
+            )
+
+        # Sort by amount descending
+        categories.sort(key=lambda x: x.total_amount, reverse=True)
+
+        # Log the action
+        now = datetime.now()
+        log_entry = Log(
+            username=current_user.username,
+            endpoint="get_multi_month_summary",
+            time=now,
+            details={
+                "start_month": start_month,
+                "end_month": end_month,
+                "total_spent": total_spent,
+                "category_count": len(categories),
+                "month_count": len(monthly_totals),
+            },
+        )
+        await Log.insert_one(log_entry)
+
+        return {
+            "start_month": start_month,
+            "end_month": end_month,
+            "total_spent": round(total_spent, 2),
+            "categories": categories,
+            "monthly_totals": monthly_totals,
+        }
+
+    except ValueError:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Invalid month format. Use YYYY-MM",
+        )

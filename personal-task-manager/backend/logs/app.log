@@ -234,3 +234,313 @@
 2025-10-22 17:42:28,972 INFO routers.ofx_router 281 User gabe retrieving transactions
 2025-10-22 17:42:45,242 INFO routers.ofx_router 281 User gabe retrieving transactions
 2025-10-22 17:42:46,609 INFO routers.ofx_router 281 User gabe retrieving transactions
+2025-10-22 17:43:15,938 INFO routers.ofx_router 234 User gabe deleting OFX file 68f95c6a76ce81dfd697fbbd
+2025-10-22 17:43:16,156 INFO routers.ofx_router 168 User gabe retrieving OFX files
+2025-10-22 17:43:16,282 INFO routers.ofx_router 371 User gabe retrieving spending summary
+2025-10-22 17:43:16,396 INFO routers.ofx_router 281 User gabe retrieving transactions
+2025-10-22 17:43:19,924 INFO routers.ofx_router 371 User gabe retrieving spending summary
+2025-10-22 17:43:20,038 INFO routers.ofx_router 281 User gabe retrieving transactions
+2025-10-22 17:43:22,913 INFO routers.ofx_router 371 User gabe retrieving spending summary
+2025-10-22 17:43:22,914 INFO routers.ofx_router 281 User gabe retrieving transactions
+2025-10-22 17:43:24,725 INFO routers.ofx_router 371 User gabe retrieving spending summary
+2025-10-22 17:43:24,726 INFO routers.ofx_router 281 User gabe retrieving transactions
+2025-10-22 17:43:31,920 INFO routers.ofx_router 234 User gabe deleting OFX file 68f95dc312ca0fb1022059b8
+2025-10-22 17:43:32,160 INFO routers.ofx_router 168 User gabe retrieving OFX files
+2025-10-22 17:43:32,287 INFO routers.ofx_router 371 User gabe retrieving spending summary
+2025-10-22 17:43:32,408 INFO routers.ofx_router 281 User gabe retrieving transactions
+2025-10-22 17:44:37,626 INFO routers.ofx_router 54 User gabe uploading OFX file: September.ofx
+2025-10-22 17:44:37,941 INFO routers.ofx_router 116 Successfully parsed 3 transactions from September.ofx
+2025-10-22 17:44:38,010 INFO routers.ofx_router 168 User gabe retrieving OFX files
+2025-10-22 17:44:38,165 INFO routers.ofx_router 371 User gabe retrieving spending summary
+2025-10-22 17:44:38,287 INFO routers.ofx_router 281 User gabe retrieving transactions
+2025-10-22 17:44:46,558 INFO routers.ofx_router 371 User gabe retrieving spending summary
+2025-10-22 17:44:46,560 INFO routers.ofx_router 281 User gabe retrieving transactions
+2025-10-22 17:44:48,197 INFO routers.ofx_router 371 User gabe retrieving spending summary
+2025-10-22 17:44:48,201 INFO routers.ofx_router 281 User gabe retrieving transactions
+2025-10-22 17:44:49,977 INFO routers.ofx_router 371 User gabe retrieving spending summary
+2025-10-22 17:44:49,977 INFO routers.ofx_router 281 User gabe retrieving transactions
+2025-10-22 17:45:31,801 INFO routers.ofx_router 234 User gabe deleting OFX file 68f95e5512ca0fb1022059e2
+2025-10-22 17:45:32,024 INFO routers.ofx_router 168 User gabe retrieving OFX files
+2025-10-22 17:45:32,143 INFO routers.ofx_router 371 User gabe retrieving spending summary
+2025-10-22 17:45:32,256 INFO routers.ofx_router 281 User gabe retrieving transactions
+2025-10-22 17:45:36,887 INFO routers.ofx_router 54 User gabe uploading OFX file: ExportedTransactions(1).ofx
+2025-10-22 17:45:37,193 INFO routers.ofx_router 116 Successfully parsed 3 transactions from ExportedTransactions(1).ofx
+2025-10-22 17:45:37,258 INFO routers.ofx_router 168 User gabe retrieving OFX files
+2025-10-22 17:45:37,368 INFO routers.ofx_router 371 User gabe retrieving spending summary
+2025-10-22 17:45:37,479 INFO routers.ofx_router 281 User gabe retrieving transactions
+2025-10-22 17:45:42,844 INFO routers.ofx_router 371 User gabe retrieving spending summary
+2025-10-22 17:45:42,845 INFO routers.ofx_router 281 User gabe retrieving transactions
+2025-10-22 17:45:44,162 INFO routers.ofx_router 371 User gabe retrieving spending summary
+2025-10-22 17:45:44,162 INFO routers.ofx_router 281 User gabe retrieving transactions
+2025-10-22 17:45:45,355 INFO routers.ofx_router 281 User gabe retrieving transactions
+2025-10-22 17:45:45,358 INFO routers.ofx_router 371 User gabe retrieving spending summary
+2025-10-22 17:45:47,369 INFO routers.ofx_router 371 User gabe retrieving spending summary
+2025-10-22 17:45:47,370 INFO routers.ofx_router 281 User gabe retrieving transactions
+2025-10-22 17:45:48,834 INFO routers.ofx_router 371 User gabe retrieving spending summary
+2025-10-22 17:45:48,835 INFO routers.ofx_router 281 User gabe retrieving transactions
+2025-10-22 17:45:51,601 INFO routers.ofx_router 371 User gabe retrieving spending summary
+2025-10-22 17:45:51,602 INFO routers.ofx_router 281 User gabe retrieving transactions
+2025-10-22 17:45:53,381 INFO routers.ofx_router 281 User gabe retrieving transactions
+2025-10-22 17:45:53,385 INFO routers.ofx_router 371 User gabe retrieving spending summary
+2025-10-22 17:46:57,461 INFO routers.ofx_router 234 User gabe deleting OFX file 68f95e9012ca0fb1022059ef
+2025-10-22 17:46:57,716 INFO routers.ofx_router 168 User gabe retrieving OFX files
+2025-10-22 17:46:57,836 INFO routers.ofx_router 371 User gabe retrieving spending summary
+2025-10-22 17:46:57,948 INFO routers.ofx_router 281 User gabe retrieving transactions
+2025-10-22 17:47:01,112 INFO routers.ofx_router 54 User gabe uploading OFX file: September.ofx
+2025-10-22 17:47:04,418 INFO routers.ofx_router 116 Successfully parsed 57 transactions from September.ofx
+2025-10-22 17:47:04,474 INFO routers.ofx_router 168 User gabe retrieving OFX files
+2025-10-22 17:47:04,584 INFO routers.ofx_router 371 User gabe retrieving spending summary
+2025-10-22 17:47:04,715 INFO routers.ofx_router 281 User gabe retrieving transactions
+2025-10-22 17:59:53,039 INFO routers.ofx_router 54 User gabe uploading OFX file: September.ofx
+2025-10-22 17:59:56,424 INFO routers.ofx_router 116 Successfully parsed 57 transactions from September.ofx
+2025-10-22 17:59:56,547 INFO routers.ofx_router 168 User gabe retrieving OFX files
+2025-10-22 17:59:56,724 INFO routers.ofx_router 371 User gabe retrieving spending summary
+2025-10-22 17:59:56,905 INFO routers.ofx_router 281 User gabe retrieving transactions
+2025-10-22 18:00:02,816 INFO routers.ofx_router 234 User gabe deleting OFX file 68f961e912ca0fb102205a3d
+2025-10-22 18:00:03,066 INFO routers.ofx_router 168 User gabe retrieving OFX files
+2025-10-22 18:00:03,196 INFO routers.ofx_router 371 User gabe retrieving spending summary
+2025-10-22 18:00:03,319 INFO routers.ofx_router 281 User gabe retrieving transactions
+2025-10-22 18:00:04,555 INFO routers.ofx_router 234 User gabe deleting OFX file 68f95ee512ca0fb102205a00
+2025-10-22 18:00:04,782 INFO routers.ofx_router 168 User gabe retrieving OFX files
+2025-10-22 18:00:04,907 INFO routers.ofx_router 371 User gabe retrieving spending summary
+2025-10-22 18:00:05,034 INFO routers.ofx_router 281 User gabe retrieving transactions
+2025-10-22 18:02:30,083 INFO routers.user_router 91 Sign-in attempt for username: gabe
+2025-10-22 18:02:30,347 INFO routers.user_router 108 User gabe logged in successfully
+2025-10-22 18:02:31,495 INFO routers.task_router 26 User gabe retrieving all tasks
+2025-10-22 18:02:31,698 INFO routers.task_router 26 User gabe retrieving all tasks
+2025-10-22 18:02:31,705 INFO routers.task_router 43 User gabe retrieving tasks (level: task)
+2025-10-22 18:02:31,855 INFO routers.task_router 43 User gabe retrieving tasks (level: task)
+2025-10-22 18:02:31,860 INFO routers.task_router 62 User gabe retrieving todos (level: todo)
+2025-10-22 18:02:31,965 INFO routers.task_router 62 User gabe retrieving todos (level: todo)
+2025-10-22 18:02:31,973 INFO routers.task_router 81 User gabe retrieving gottados (level: gottado)
+2025-10-22 18:02:32,081 INFO routers.task_router 81 User gabe retrieving gottados (level: gottado)
+2025-10-22 18:02:41,326 INFO routers.ofx_router 168 User gabe retrieving OFX files
+2025-10-22 18:02:41,332 INFO routers.ofx_router 371 User gabe retrieving spending summary
+2025-10-22 18:02:41,333 INFO routers.ofx_router 281 User gabe retrieving transactions
+2025-10-22 18:02:41,412 INFO routers.ofx_router 281 User gabe retrieving transactions
+2025-10-22 18:02:41,447 INFO routers.ofx_router 168 User gabe retrieving OFX files
+2025-10-22 18:02:41,467 INFO routers.ofx_router 371 User gabe retrieving spending summary
+2025-10-22 18:02:47,210 INFO routers.ofx_router 54 User gabe uploading OFX file: ExportedTransactions.ofx
+2025-10-22 18:03:20,508 INFO routers.ofx_router 116 Successfully parsed 565 transactions from ExportedTransactions.ofx
+2025-10-22 18:03:20,572 INFO routers.ofx_router 168 User gabe retrieving OFX files
+2025-10-22 18:03:20,688 INFO routers.ofx_router 371 User gabe retrieving spending summary
+2025-10-22 18:03:20,805 INFO routers.ofx_router 281 User gabe retrieving transactions
+2025-10-22 18:03:28,786 INFO routers.ofx_router 371 User gabe retrieving spending summary
+2025-10-22 18:03:28,787 INFO routers.ofx_router 281 User gabe retrieving transactions
+2025-10-22 18:03:36,776 INFO routers.ofx_router 371 User gabe retrieving spending summary
+2025-10-22 18:03:36,777 INFO routers.ofx_router 281 User gabe retrieving transactions
+2025-10-22 18:03:42,066 INFO routers.ofx_router 281 User gabe retrieving transactions
+2025-10-22 18:03:42,066 INFO routers.ofx_router 371 User gabe retrieving spending summary
+2025-10-22 18:03:44,714 INFO routers.ofx_router 371 User gabe retrieving spending summary
+2025-10-22 18:03:44,715 INFO routers.ofx_router 281 User gabe retrieving transactions
+2025-10-22 18:03:47,786 INFO routers.ofx_router 371 User gabe retrieving spending summary
+2025-10-22 18:03:47,790 INFO routers.ofx_router 281 User gabe retrieving transactions
+2025-10-22 18:03:52,929 INFO routers.ofx_router 371 User gabe retrieving spending summary
+2025-10-22 18:03:52,930 INFO routers.ofx_router 281 User gabe retrieving transactions
+2025-10-22 18:04:02,331 INFO routers.ofx_router 371 User gabe retrieving spending summary
+2025-10-22 18:04:02,332 INFO routers.ofx_router 281 User gabe retrieving transactions
+2025-10-22 18:04:15,710 INFO routers.ofx_router 371 User gabe retrieving spending summary
+2025-10-22 18:04:15,712 INFO routers.ofx_router 281 User gabe retrieving transactions
+2025-10-22 18:04:20,125 INFO routers.ofx_router 281 User gabe retrieving transactions
+2025-10-22 18:04:20,126 INFO routers.ofx_router 371 User gabe retrieving spending summary
+2025-10-22 18:04:22,503 INFO routers.ofx_router 371 User gabe retrieving spending summary
+2025-10-22 18:04:22,503 INFO routers.ofx_router 281 User gabe retrieving transactions
+2025-10-22 18:04:24,253 INFO routers.ofx_router 281 User gabe retrieving transactions
+2025-10-22 18:04:24,862 INFO routers.ofx_router 281 User gabe retrieving transactions
+2025-10-22 18:04:25,512 INFO routers.ofx_router 281 User gabe retrieving transactions
+2025-10-22 18:04:26,105 INFO routers.ofx_router 281 User gabe retrieving transactions
+2025-10-22 18:04:33,630 INFO routers.ofx_router 281 User gabe retrieving transactions
+2025-10-22 18:04:34,038 INFO routers.ofx_router 281 User gabe retrieving transactions
+2025-10-22 18:04:34,436 INFO routers.ofx_router 281 User gabe retrieving transactions
+2025-10-22 18:04:34,710 INFO routers.ofx_router 281 User gabe retrieving transactions
+2025-10-22 18:04:35,413 INFO routers.ofx_router 281 User gabe retrieving transactions
+2025-10-22 18:04:35,757 INFO routers.ofx_router 281 User gabe retrieving transactions
+2025-10-22 18:04:37,173 INFO routers.ofx_router 281 User gabe retrieving transactions
+2025-10-22 18:04:37,968 INFO routers.ofx_router 281 User gabe retrieving transactions
+2025-10-22 18:04:38,487 INFO routers.ofx_router 281 User gabe retrieving transactions
+2025-10-22 18:04:41,038 INFO routers.ofx_router 371 User gabe retrieving spending summary
+2025-10-22 18:04:41,165 INFO routers.ofx_router 281 User gabe retrieving transactions
+2025-10-22 18:04:43,187 INFO routers.ofx_router 281 User gabe retrieving transactions
+2025-10-22 18:04:46,036 INFO routers.ofx_router 371 User gabe retrieving spending summary
+2025-10-22 18:04:46,039 INFO routers.ofx_router 281 User gabe retrieving transactions
+2025-10-22 18:04:47,881 INFO routers.ofx_router 371 User gabe retrieving spending summary
+2025-10-22 18:04:47,882 INFO routers.ofx_router 281 User gabe retrieving transactions
+2025-10-22 18:05:11,147 INFO routers.ofx_router 234 User gabe deleting OFX file 68f9629712ca0fb102205a8d
+2025-10-22 18:05:11,393 INFO routers.ofx_router 168 User gabe retrieving OFX files
+2025-10-22 18:05:11,505 INFO routers.ofx_router 371 User gabe retrieving spending summary
+2025-10-22 18:05:11,620 INFO routers.ofx_router 281 User gabe retrieving transactions
+2025-10-22 18:05:15,985 INFO routers.ofx_router 54 User gabe uploading OFX file: ExportedTransactions(2).ofx
+2025-10-22 18:05:23,701 INFO routers.ofx_router 116 Successfully parsed 135 transactions from ExportedTransactions(2).ofx
+2025-10-22 18:05:23,762 INFO routers.ofx_router 168 User gabe retrieving OFX files
+2025-10-22 18:05:23,881 INFO routers.ofx_router 371 User gabe retrieving spending summary
+2025-10-22 18:05:24,001 INFO routers.ofx_router 281 User gabe retrieving transactions
+2025-10-22 18:05:37,054 INFO routers.ofx_router 371 User gabe retrieving spending summary
+2025-10-22 18:05:37,055 INFO routers.ofx_router 281 User gabe retrieving transactions
+2025-10-22 18:10:21,129 INFO routers.ofx_router 371 User gabe retrieving spending summary
+2025-10-22 18:10:21,131 INFO routers.ofx_router 168 User gabe retrieving OFX files
+2025-10-22 18:10:21,172 INFO routers.ofx_router 281 User gabe retrieving transactions
+2025-10-22 18:10:21,322 INFO main 34 Application Shuts down
+2025-10-22 18:10:23,331 INFO main 30 Application Starts...
+2025-10-22 18:10:25,707 INFO __name__ 26 database started
+2025-10-22 18:10:25,750 INFO routers.ofx_router 371 User gabe retrieving spending summary
+2025-10-22 18:10:25,750 INFO routers.ofx_router 281 User gabe retrieving transactions
+2025-10-22 18:10:25,751 INFO routers.ofx_router 168 User gabe retrieving OFX files
+2025-10-22 18:10:25,865 INFO routers.ofx_router 371 User gabe retrieving spending summary
+2025-10-22 18:10:25,982 INFO routers.ofx_router 371 User gabe retrieving spending summary
+2025-10-22 18:10:26,092 INFO routers.ofx_router 371 User gabe retrieving spending summary
+2025-10-22 18:10:26,108 INFO routers.ofx_router 281 User gabe retrieving transactions
+2025-10-22 18:10:26,254 INFO routers.ofx_router 168 User gabe retrieving OFX files
+2025-10-22 18:10:26,255 INFO routers.ofx_router 371 User gabe retrieving spending summary
+2025-10-22 18:10:26,256 INFO routers.ofx_router 281 User gabe retrieving transactions
+2025-10-22 18:10:26,321 INFO routers.ofx_router 281 User gabe retrieving transactions
+2025-10-22 18:10:26,379 INFO routers.ofx_router 168 User gabe retrieving OFX files
+2025-10-22 18:10:26,385 INFO routers.ofx_router 281 User gabe retrieving transactions
+2025-10-22 18:10:26,494 INFO routers.ofx_router 168 User gabe retrieving OFX files
+2025-10-22 18:10:26,601 INFO routers.ofx_router 168 User gabe retrieving OFX files
+2025-10-22 18:10:33,804 INFO routers.ofx_router 168 User gabe retrieving OFX files
+2025-10-22 18:10:33,806 INFO routers.ofx_router 371 User gabe retrieving spending summary
+2025-10-22 18:10:33,807 INFO routers.ofx_router 281 User gabe retrieving transactions
+2025-10-22 18:10:33,869 INFO routers.ofx_router 281 User gabe retrieving transactions
+2025-10-22 18:10:33,915 INFO routers.ofx_router 168 User gabe retrieving OFX files
+2025-10-22 18:10:33,916 INFO routers.ofx_router 371 User gabe retrieving spending summary
+2025-10-22 18:10:40,248 INFO routers.ofx_router 168 User gabe retrieving OFX files
+2025-10-22 18:10:40,251 INFO routers.ofx_router 371 User gabe retrieving spending summary
+2025-10-22 18:10:40,256 INFO routers.ofx_router 281 User gabe retrieving transactions
+2025-10-22 18:10:40,321 INFO routers.ofx_router 281 User gabe retrieving transactions
+2025-10-22 18:10:40,357 INFO routers.ofx_router 168 User gabe retrieving OFX files
+2025-10-22 18:10:40,361 INFO routers.ofx_router 371 User gabe retrieving spending summary
+2025-10-22 18:10:49,369 INFO routers.ofx_router 168 User gabe retrieving OFX files
+2025-10-22 18:10:49,376 INFO routers.ofx_router 281 User gabe retrieving transactions
+2025-10-22 18:10:49,377 INFO routers.ofx_router 371 User gabe retrieving spending summary
+2025-10-22 18:10:49,682 INFO routers.ofx_router 371 User gabe retrieving spending summary
+2025-10-22 18:10:49,683 INFO routers.ofx_router 168 User gabe retrieving OFX files
+2025-10-22 18:10:49,684 INFO routers.ofx_router 281 User gabe retrieving transactions
+2025-10-22 18:10:56,875 INFO routers.ofx_router 168 User gabe retrieving OFX files
+2025-10-22 18:10:56,876 INFO routers.ofx_router 371 User gabe retrieving spending summary
+2025-10-22 18:10:56,877 INFO routers.ofx_router 281 User gabe retrieving transactions
+2025-10-22 18:10:56,941 INFO routers.ofx_router 281 User gabe retrieving transactions
+2025-10-22 18:10:56,980 INFO routers.ofx_router 168 User gabe retrieving OFX files
+2025-10-22 18:10:57,000 INFO routers.ofx_router 371 User gabe retrieving spending summary
+2025-10-22 18:11:11,380 INFO routers.ofx_router 168 User gabe retrieving OFX files
+2025-10-22 18:11:11,381 INFO routers.ofx_router 371 User gabe retrieving spending summary
+2025-10-22 18:11:11,382 INFO routers.ofx_router 281 User gabe retrieving transactions
+2025-10-22 18:11:11,540 INFO main 34 Application Shuts down
+2025-10-22 18:11:13,241 INFO main 30 Application Starts...
+2025-10-22 18:11:15,369 INFO __name__ 26 database started
+2025-10-22 18:11:15,402 INFO routers.ofx_router 168 User gabe retrieving OFX files
+2025-10-22 18:11:15,403 INFO routers.ofx_router 281 User gabe retrieving transactions
+2025-10-22 18:11:15,404 INFO routers.ofx_router 371 User gabe retrieving spending summary
+2025-10-22 18:18:15,153 INFO routers.ofx_router 168 User gabe retrieving OFX files
+2025-10-22 18:18:15,162 INFO routers.ofx_router 371 User gabe retrieving spending summary
+2025-10-22 18:18:15,163 INFO routers.ofx_router 281 User gabe retrieving transactions
+2025-10-22 18:18:15,232 INFO routers.ofx_router 281 User gabe retrieving transactions
+2025-10-22 18:18:15,288 INFO routers.ofx_router 168 User gabe retrieving OFX files
+2025-10-22 18:18:15,296 INFO routers.ofx_router 371 User gabe retrieving spending summary
+2025-10-22 18:18:21,471 INFO routers.ofx_router 371 User gabe retrieving spending summary
+2025-10-22 18:18:25,449 INFO routers.ofx_router 371 User gabe retrieving spending summary
+2025-10-22 18:18:25,451 INFO routers.ofx_router 281 User gabe retrieving transactions
+2025-10-22 18:18:27,880 INFO routers.ofx_router 371 User gabe retrieving spending summary
+2025-10-22 18:18:27,882 INFO routers.ofx_router 281 User gabe retrieving transactions
+2025-10-22 18:18:35,435 INFO routers.ofx_router 281 User gabe retrieving transactions
+2025-10-22 18:25:29,104 INFO routers.ofx_router 371 User gabe retrieving spending summary
+2025-10-22 18:25:29,111 INFO routers.ofx_router 168 User gabe retrieving OFX files
+2025-10-22 18:25:29,112 INFO routers.ofx_router 281 User gabe retrieving transactions
+2025-10-22 18:25:29,256 INFO main 34 Application Shuts down
+2025-10-22 18:25:31,540 INFO main 30 Application Starts...
+2025-10-22 18:25:34,359 INFO __name__ 26 database started
+2025-10-22 18:25:34,421 INFO routers.ofx_router 282 User gabe retrieving transactions
+2025-10-22 18:25:34,422 INFO routers.ofx_router 168 User gabe retrieving OFX files
+2025-10-22 18:25:34,423 INFO routers.ofx_router 375 User gabe retrieving spending summary
+2025-10-22 18:25:35,782 INFO routers.ofx_router 168 User gabe retrieving OFX files
+2025-10-22 18:25:35,783 INFO routers.ofx_router 375 User gabe retrieving spending summary
+2025-10-22 18:25:35,786 INFO routers.ofx_router 282 User gabe retrieving transactions
+2025-10-22 18:25:35,952 INFO routers.ofx_router 168 User gabe retrieving OFX files
+2025-10-22 18:25:35,953 INFO routers.ofx_router 375 User gabe retrieving spending summary
+2025-10-22 18:25:35,954 INFO routers.ofx_router 282 User gabe retrieving transactions
+2025-10-22 18:28:41,942 INFO routers.ofx_router 282 User gabe retrieving transactions
+2025-10-22 18:28:41,943 INFO routers.ofx_router 375 User gabe retrieving spending summary
+2025-10-22 18:28:42,225 INFO main 34 Application Shuts down
+2025-10-22 18:28:44,451 INFO main 30 Application Starts...
+2025-10-22 18:28:46,767 INFO __name__ 26 database started
+2025-10-22 18:28:46,817 INFO routers.ofx_router 282 User gabe retrieving transactions
+2025-10-22 18:28:46,818 INFO routers.ofx_router 168 User gabe retrieving OFX files
+2025-10-22 18:28:46,819 INFO routers.ofx_router 375 User gabe retrieving spending summary
+2025-10-22 18:28:46,876 INFO routers.ofx_router 282 User gabe retrieving transactions
+2025-10-22 18:28:47,223 INFO routers.ofx_router 375 User gabe retrieving spending summary
+2025-10-22 18:28:47,236 INFO routers.ofx_router 168 User gabe retrieving OFX files
+2025-10-22 18:28:52,724 INFO routers.ofx_router 282 User gabe retrieving transactions
+2025-10-22 18:28:52,728 INFO routers.ofx_router 375 User gabe retrieving spending summary
+2025-10-22 18:28:56,288 INFO routers.task_router 26 User gabe retrieving all tasks
+2025-10-22 18:28:56,403 INFO routers.task_router 26 User gabe retrieving all tasks
+2025-10-22 18:28:56,411 INFO routers.task_router 43 User gabe retrieving tasks (level: task)
+2025-10-22 18:28:56,521 INFO routers.task_router 43 User gabe retrieving tasks (level: task)
+2025-10-22 18:28:56,534 INFO routers.task_router 62 User gabe retrieving todos (level: todo)
+2025-10-22 18:28:56,643 INFO routers.task_router 62 User gabe retrieving todos (level: todo)
+2025-10-22 18:28:56,653 INFO routers.task_router 81 User gabe retrieving gottados (level: gottado)
+2025-10-22 18:28:56,784 INFO routers.task_router 81 User gabe retrieving gottados (level: gottado)
+2025-10-22 18:29:03,822 INFO routers.ofx_router 168 User gabe retrieving OFX files
+2025-10-22 18:29:03,824 INFO routers.ofx_router 375 User gabe retrieving spending summary
+2025-10-22 18:29:03,825 INFO routers.ofx_router 282 User gabe retrieving transactions
+2025-10-22 18:29:03,888 INFO routers.ofx_router 282 User gabe retrieving transactions
+2025-10-22 18:29:03,943 INFO routers.ofx_router 375 User gabe retrieving spending summary
+2025-10-22 18:29:03,947 INFO routers.ofx_router 168 User gabe retrieving OFX files
+2025-10-22 18:29:14,984 INFO routers.ofx_router 375 User gabe retrieving spending summary
+2025-10-22 18:29:14,988 INFO routers.ofx_router 282 User gabe retrieving transactions
+2025-10-22 18:29:28,498 INFO routers.ofx_router 234 User gabe deleting OFX file 68f9632b12ca0fb102205cd6
+2025-10-22 18:29:28,739 INFO routers.ofx_router 168 User gabe retrieving OFX files
+2025-10-22 18:29:28,871 INFO routers.ofx_router 375 User gabe retrieving spending summary
+2025-10-22 18:29:28,882 INFO routers.ofx_router 282 User gabe retrieving transactions
+2025-10-22 18:29:39,096 INFO routers.ofx_router 54 User gabe uploading OFX file: September.ofx
+2025-10-22 18:29:42,375 INFO routers.ofx_router 116 Successfully parsed 57 transactions from September.ofx
+2025-10-22 18:29:42,437 INFO routers.ofx_router 168 User gabe retrieving OFX files
+2025-10-22 18:29:42,554 INFO routers.ofx_router 375 User gabe retrieving spending summary
+2025-10-22 18:29:42,564 INFO routers.ofx_router 282 User gabe retrieving transactions
+2025-10-22 18:29:46,572 INFO routers.ofx_router 282 User gabe retrieving transactions
+2025-10-22 18:29:46,574 INFO routers.ofx_router 375 User gabe retrieving spending summary
+2025-10-22 18:29:49,787 INFO routers.ofx_router 282 User gabe retrieving transactions
+2025-10-22 18:29:49,787 INFO routers.ofx_router 375 User gabe retrieving spending summary
+2025-10-22 18:29:50,982 INFO routers.ofx_router 282 User gabe retrieving transactions
+2025-10-22 18:29:50,987 INFO routers.ofx_router 375 User gabe retrieving spending summary
+2025-10-22 18:31:16,624 INFO routers.ofx_router 168 User gabe retrieving OFX files
+2025-10-22 18:31:16,625 INFO routers.ofx_router 375 User gabe retrieving spending summary
+2025-10-22 18:31:16,626 INFO routers.ofx_router 282 User gabe retrieving transactions
+2025-10-22 18:31:16,689 INFO routers.ofx_router 282 User gabe retrieving transactions
+2025-10-22 18:31:16,814 INFO main 34 Application Shuts down
+2025-10-22 18:31:18,946 INFO main 30 Application Starts...
+2025-10-22 18:31:21,160 INFO __name__ 26 database started
+2025-10-22 18:31:21,197 INFO routers.ofx_router 375 User gabe retrieving spending summary
+2025-10-22 18:31:21,198 INFO routers.ofx_router 168 User gabe retrieving OFX files
+2025-10-22 18:31:21,201 INFO routers.ofx_router 282 User gabe retrieving transactions
+2025-10-22 18:31:38,809 INFO routers.ofx_router 282 User gabe retrieving transactions
+2025-10-22 18:31:38,811 INFO routers.ofx_router 375 User gabe retrieving spending summary
+2025-10-22 18:31:42,015 INFO routers.ofx_router 282 User gabe retrieving transactions
+2025-10-22 18:31:42,016 INFO routers.ofx_router 375 User gabe retrieving spending summary
+2025-10-22 18:31:43,716 INFO routers.ofx_router 282 User gabe retrieving transactions
+2025-10-22 18:31:43,720 INFO routers.ofx_router 375 User gabe retrieving spending summary
+2025-10-22 18:31:44,771 INFO routers.ofx_router 282 User gabe retrieving transactions
+2025-10-22 18:31:44,774 INFO routers.ofx_router 375 User gabe retrieving spending summary
+2025-10-22 18:31:50,151 INFO routers.ofx_router 54 User gabe uploading OFX file: ExportedTransactions(2).ofx
+2025-10-22 18:31:57,831 INFO routers.ofx_router 116 Successfully parsed 135 transactions from ExportedTransactions(2).ofx
+2025-10-22 18:31:57,896 INFO routers.ofx_router 168 User gabe retrieving OFX files
+2025-10-22 18:31:58,006 INFO routers.ofx_router 375 User gabe retrieving spending summary
+2025-10-22 18:31:58,229 INFO routers.ofx_router 282 User gabe retrieving transactions
+2025-10-22 18:32:12,910 INFO routers.ofx_router 375 User gabe retrieving spending summary
+2025-10-22 18:32:12,912 INFO routers.ofx_router 282 User gabe retrieving transactions
+2025-10-22 18:32:17,211 INFO routers.ofx_router 282 User gabe retrieving transactions
+2025-10-22 18:32:17,211 INFO routers.ofx_router 375 User gabe retrieving spending summary
+2025-10-22 18:32:19,759 INFO routers.ofx_router 375 User gabe retrieving spending summary
+2025-10-22 18:32:19,760 INFO routers.ofx_router 282 User gabe retrieving transactions
+2025-10-22 18:32:20,740 INFO routers.ofx_router 282 User gabe retrieving transactions
+2025-10-22 18:32:20,744 INFO routers.ofx_router 375 User gabe retrieving spending summary
+2025-10-22 18:35:45,506 INFO routers.ofx_router 469 User gabe retrieving multi-month spending summary
+2025-10-22 18:35:54,547 INFO routers.ofx_router 375 User gabe retrieving spending summary
+2025-10-22 18:35:57,859 INFO routers.ofx_router 375 User gabe retrieving spending summary
+2025-10-22 18:35:57,861 INFO routers.ofx_router 282 User gabe retrieving transactions
+2025-10-22 18:35:59,228 INFO routers.ofx_router 375 User gabe retrieving spending summary
+2025-10-22 18:35:59,229 INFO routers.ofx_router 282 User gabe retrieving transactions
+2025-10-22 18:36:02,627 INFO routers.ofx_router 375 User gabe retrieving spending summary
+2025-10-22 18:36:02,628 INFO routers.ofx_router 282 User gabe retrieving transactions
+2025-10-22 18:36:04,354 INFO routers.ofx_router 375 User gabe retrieving spending summary
+2025-10-22 18:36:04,356 INFO routers.ofx_router 282 User gabe retrieving transactions
+2025-10-22 18:36:07,890 INFO routers.ofx_router 375 User gabe retrieving spending summary
+2025-10-22 18:36:07,891 INFO routers.ofx_router 282 User gabe retrieving transactions
