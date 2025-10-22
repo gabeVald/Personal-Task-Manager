@@ -14,6 +14,7 @@ from routers.task_router import task_router
 from routers.user_router import user_router
 from routers.file_router import file_router
 from routers.log_router import log_router
+from routers.ofx_router import ofx_router
 
 from logging_setup import setup_logging
 
@@ -48,6 +49,7 @@ app.include_router(task_router, tags=["Todos"], prefix="/todos")
 app.include_router(user_router, tags=["Users"], prefix="/users")
 app.include_router(file_router, tags=["Files"], prefix="/todos/files")
 app.include_router(log_router, tags=["Logs"], prefix="/logs")
+app.include_router(ofx_router, tags=["OFX"], prefix="/budget")
 
 
 @app.get("/")

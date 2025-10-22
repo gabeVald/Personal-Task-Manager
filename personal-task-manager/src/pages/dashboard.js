@@ -460,6 +460,13 @@ export default function Home() {
                 >
                     <div className="flex flex-col space-y-2">
                         <CreateTaskDialog onTaskCreated={fetchTasks} />
+                        <Button
+                            variant="ghost"
+                            className="w-full mt-2 flex items-center gap-2"
+                            onClick={() => router.push("/budget")}
+                        >
+                            Budget & Expenses
+                        </Button>
                         {isAdmin && (
                             <>
                                 <Separator />

@@ -5,6 +5,7 @@ from models.task import Task
 from models.user import User
 from models.log import Log
 from models.file import File
+from models.ofx_file import OFXFile, Transaction
 
 from motor.motor_asyncio import AsyncIOMotorClient
 import certifi
@@ -21,5 +22,5 @@ async def init_database():
     # Use the SSL context in the MongoDB client
     client = AsyncIOMotorClient(my_config.connection_string, tlsCAFile=certifi.where())
     db = client["gottaDo_app"]
-    await init_beanie(database=db, document_models=[User, Task, Log, File])
+    await init_beanie(database=db, document_models=[User, Task, Log, File, OFXFile, Transaction])
     logger.info("database started")

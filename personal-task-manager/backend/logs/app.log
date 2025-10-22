@@ -82,3 +82,155 @@
 2025-04-27 18:09:28,511 INFO routers.task_router 62 User gabe retrieving todos (level: todo)
 2025-04-27 18:09:28,529 INFO routers.task_router 81 User gabe retrieving gottados (level: gottado)
 2025-04-27 18:09:28,619 INFO routers.task_router 81 User gabe retrieving gottados (level: gottado)
+2025-10-22 16:21:34,931 INFO main 29 Application Starts...
+2025-10-22 16:21:37,106 INFO __name__ 25 database started
+2025-10-22 16:33:05,742 INFO routers.user_router 91 Sign-in attempt for username: gabe
+2025-10-22 16:33:06,061 INFO routers.user_router 108 User gabe logged in successfully
+2025-10-22 16:33:11,014 INFO routers.task_router 26 User gabe retrieving all tasks
+2025-10-22 16:33:11,128 INFO routers.task_router 26 User gabe retrieving all tasks
+2025-10-22 16:33:11,134 INFO routers.task_router 43 User gabe retrieving tasks (level: task)
+2025-10-22 16:33:11,622 INFO routers.task_router 43 User gabe retrieving tasks (level: task)
+2025-10-22 16:33:11,625 INFO routers.task_router 62 User gabe retrieving todos (level: todo)
+2025-10-22 16:33:11,737 INFO routers.task_router 81 User gabe retrieving gottados (level: gottado)
+2025-10-22 16:33:11,740 INFO routers.task_router 62 User gabe retrieving todos (level: todo)
+2025-10-22 16:33:11,904 INFO routers.task_router 81 User gabe retrieving gottados (level: gottado)
+2025-10-22 17:11:13,199 INFO routers.task_router 26 User gabe retrieving all tasks
+2025-10-22 17:11:13,732 INFO main 33 Application Shuts down
+2025-10-22 17:32:23,429 INFO main 30 Application Starts...
+2025-10-22 17:32:26,746 INFO __name__ 26 database started
+2025-10-22 17:32:33,373 INFO routers.user_router 91 Sign-in attempt for username: gabe
+2025-10-22 17:32:33,658 INFO routers.user_router 108 User gabe logged in successfully
+2025-10-22 17:32:34,523 INFO routers.task_router 26 User gabe retrieving all tasks
+2025-10-22 17:32:34,637 INFO routers.task_router 26 User gabe retrieving all tasks
+2025-10-22 17:32:34,646 INFO routers.task_router 43 User gabe retrieving tasks (level: task)
+2025-10-22 17:32:35,164 INFO routers.task_router 43 User gabe retrieving tasks (level: task)
+2025-10-22 17:32:35,170 INFO routers.task_router 62 User gabe retrieving todos (level: todo)
+2025-10-22 17:32:35,281 INFO routers.task_router 62 User gabe retrieving todos (level: todo)
+2025-10-22 17:32:35,301 INFO routers.task_router 81 User gabe retrieving gottados (level: gottado)
+2025-10-22 17:32:35,409 INFO routers.task_router 81 User gabe retrieving gottados (level: gottado)
+2025-10-22 17:33:23,053 INFO routers.ofx_router 166 User gabe retrieving OFX files
+2025-10-22 17:33:23,055 INFO routers.ofx_router 369 User gabe retrieving spending summary
+2025-10-22 17:33:23,056 INFO routers.ofx_router 279 User gabe retrieving transactions
+2025-10-22 17:33:23,177 INFO routers.ofx_router 369 User gabe retrieving spending summary
+2025-10-22 17:33:23,182 INFO routers.ofx_router 166 User gabe retrieving OFX files
+2025-10-22 17:33:23,445 INFO routers.ofx_router 279 User gabe retrieving transactions
+2025-10-22 17:33:32,650 INFO routers.ofx_router 54 User gabe uploading OFX file: ExportedTransactions.ofx
+2025-10-22 17:33:32,731 ERRO routers.ofx_router 119 Error parsing OFX file ExportedTransactions.ofx: module 'ofxparse' has no attribute 'parse'
+2025-10-22 17:33:32,786 ERRO routers.ofx_router 152 Error uploading OFX file: 400: Failed to parse OFX file: module 'ofxparse' has no attribute 'parse'
+2025-10-22 17:34:07,920 INFO routers.task_router 26 User gabe retrieving all tasks
+2025-10-22 17:34:08,032 INFO routers.task_router 26 User gabe retrieving all tasks
+2025-10-22 17:34:08,055 INFO routers.task_router 43 User gabe retrieving tasks (level: task)
+2025-10-22 17:34:08,299 INFO routers.task_router 43 User gabe retrieving tasks (level: task)
+2025-10-22 17:34:08,300 INFO routers.task_router 62 User gabe retrieving todos (level: todo)
+2025-10-22 17:34:08,418 INFO routers.task_router 62 User gabe retrieving todos (level: todo)
+2025-10-22 17:34:08,421 INFO routers.task_router 81 User gabe retrieving gottados (level: gottado)
+2025-10-22 17:34:08,540 INFO routers.task_router 81 User gabe retrieving gottados (level: gottado)
+2025-10-22 17:34:09,236 INFO routers.task_router 26 User gabe retrieving all tasks
+2025-10-22 17:34:09,353 INFO routers.task_router 26 User gabe retrieving all tasks
+2025-10-22 17:34:09,355 INFO routers.task_router 43 User gabe retrieving tasks (level: task)
+2025-10-22 17:34:09,468 INFO routers.task_router 43 User gabe retrieving tasks (level: task)
+2025-10-22 17:34:09,475 INFO routers.task_router 62 User gabe retrieving todos (level: todo)
+2025-10-22 17:34:09,585 INFO routers.task_router 62 User gabe retrieving todos (level: todo)
+2025-10-22 17:34:09,587 INFO routers.task_router 81 User gabe retrieving gottados (level: gottado)
+2025-10-22 17:34:09,700 INFO routers.task_router 81 User gabe retrieving gottados (level: gottado)
+2025-10-22 17:34:11,975 INFO routers.ofx_router 166 User gabe retrieving OFX files
+2025-10-22 17:34:11,977 INFO routers.ofx_router 369 User gabe retrieving spending summary
+2025-10-22 17:34:11,978 INFO routers.ofx_router 279 User gabe retrieving transactions
+2025-10-22 17:34:12,038 INFO routers.ofx_router 279 User gabe retrieving transactions
+2025-10-22 17:34:12,163 INFO routers.ofx_router 166 User gabe retrieving OFX files
+2025-10-22 17:34:12,165 INFO routers.ofx_router 369 User gabe retrieving spending summary
+2025-10-22 17:35:42,910 INFO routers.ofx_router 369 User gabe retrieving spending summary
+2025-10-22 17:35:42,911 INFO routers.ofx_router 279 User gabe retrieving transactions
+2025-10-22 17:35:52,210 INFO routers.ofx_router 369 User gabe retrieving spending summary
+2025-10-22 17:35:52,212 INFO routers.ofx_router 279 User gabe retrieving transactions
+2025-10-22 17:36:02,024 INFO routers.task_router 26 User gabe retrieving all tasks
+2025-10-22 17:36:02,153 INFO routers.task_router 26 User gabe retrieving all tasks
+2025-10-22 17:36:02,157 INFO routers.task_router 43 User gabe retrieving tasks (level: task)
+2025-10-22 17:36:02,269 INFO routers.task_router 43 User gabe retrieving tasks (level: task)
+2025-10-22 17:36:02,276 INFO routers.task_router 62 User gabe retrieving todos (level: todo)
+2025-10-22 17:36:02,384 INFO routers.task_router 62 User gabe retrieving todos (level: todo)
+2025-10-22 17:36:02,390 INFO routers.task_router 81 User gabe retrieving gottados (level: gottado)
+2025-10-22 17:36:02,511 INFO routers.task_router 81 User gabe retrieving gottados (level: gottado)
+2025-10-22 17:36:04,852 INFO routers.ofx_router 166 User gabe retrieving OFX files
+2025-10-22 17:36:04,860 INFO routers.ofx_router 369 User gabe retrieving spending summary
+2025-10-22 17:36:04,862 INFO routers.ofx_router 279 User gabe retrieving transactions
+2025-10-22 17:36:04,931 INFO routers.ofx_router 279 User gabe retrieving transactions
+2025-10-22 17:36:04,973 INFO routers.ofx_router 166 User gabe retrieving OFX files
+2025-10-22 17:36:04,977 INFO routers.ofx_router 369 User gabe retrieving spending summary
+2025-10-22 17:36:11,237 INFO routers.task_router 26 User gabe retrieving all tasks
+2025-10-22 17:36:11,346 INFO routers.task_router 26 User gabe retrieving all tasks
+2025-10-22 17:36:11,349 INFO routers.task_router 43 User gabe retrieving tasks (level: task)
+2025-10-22 17:36:11,459 INFO routers.task_router 43 User gabe retrieving tasks (level: task)
+2025-10-22 17:36:11,470 INFO routers.task_router 62 User gabe retrieving todos (level: todo)
+2025-10-22 17:36:11,580 INFO routers.task_router 62 User gabe retrieving todos (level: todo)
+2025-10-22 17:36:11,582 INFO routers.task_router 81 User gabe retrieving gottados (level: gottado)
+2025-10-22 17:36:11,750 INFO routers.task_router 81 User gabe retrieving gottados (level: gottado)
+2025-10-22 17:36:13,426 INFO routers.ofx_router 166 User gabe retrieving OFX files
+2025-10-22 17:36:13,427 INFO routers.ofx_router 369 User gabe retrieving spending summary
+2025-10-22 17:36:13,429 INFO routers.ofx_router 279 User gabe retrieving transactions
+2025-10-22 17:36:13,488 INFO routers.ofx_router 279 User gabe retrieving transactions
+2025-10-22 17:36:13,541 INFO routers.ofx_router 166 User gabe retrieving OFX files
+2025-10-22 17:36:13,544 INFO routers.ofx_router 369 User gabe retrieving spending summary
+2025-10-22 17:36:21,765 INFO routers.ofx_router 232 User gabe deleting OFX file 68f95bbc76ce81dfd697fb8b
+2025-10-22 17:36:21,985 INFO routers.ofx_router 166 User gabe retrieving OFX files
+2025-10-22 17:36:22,108 INFO routers.ofx_router 369 User gabe retrieving spending summary
+2025-10-22 17:36:22,222 INFO routers.ofx_router 279 User gabe retrieving transactions
+2025-10-22 17:36:26,605 INFO routers.ofx_router 54 User gabe uploading OFX file: ExportedTransactions.ofx
+2025-10-22 17:36:26,663 ERRO routers.ofx_router 119 Error parsing OFX file ExportedTransactions.ofx: module 'ofxparse' has no attribute 'parse'
+2025-10-22 17:36:26,716 ERRO routers.ofx_router 152 Error uploading OFX file: 400: Failed to parse OFX file: module 'ofxparse' has no attribute 'parse'
+2025-10-22 17:41:27,252 INFO main 34 Application Shuts down
+2025-10-22 17:41:28,959 INFO main 30 Application Starts...
+2025-10-22 17:41:31,661 INFO __name__ 26 database started
+2025-10-22 17:41:33,149 INFO routers.ofx_router 281 User gabe retrieving transactions
+2025-10-22 17:41:33,150 INFO routers.ofx_router 371 User gabe retrieving spending summary
+2025-10-22 17:41:33,151 INFO routers.ofx_router 168 User gabe retrieving OFX files
+2025-10-22 17:41:33,204 INFO routers.ofx_router 281 User gabe retrieving transactions
+2025-10-22 17:41:33,582 INFO routers.ofx_router 168 User gabe retrieving OFX files
+2025-10-22 17:41:33,592 INFO routers.ofx_router 371 User gabe retrieving spending summary
+2025-10-22 17:41:39,989 INFO routers.task_router 26 User gabe retrieving all tasks
+2025-10-22 17:41:39,991 INFO routers.task_router 26 User gabe retrieving all tasks
+2025-10-22 17:41:40,124 INFO routers.task_router 43 User gabe retrieving tasks (level: task)
+2025-10-22 17:41:40,235 INFO routers.task_router 43 User gabe retrieving tasks (level: task)
+2025-10-22 17:41:40,245 INFO routers.task_router 62 User gabe retrieving todos (level: todo)
+2025-10-22 17:41:40,357 INFO routers.task_router 62 User gabe retrieving todos (level: todo)
+2025-10-22 17:41:40,359 INFO routers.task_router 81 User gabe retrieving gottados (level: gottado)
+2025-10-22 17:41:40,481 INFO routers.task_router 81 User gabe retrieving gottados (level: gottado)
+2025-10-22 17:41:42,356 INFO routers.user_router 91 Sign-in attempt for username: gabe
+2025-10-22 17:41:42,633 INFO routers.user_router 108 User gabe logged in successfully
+2025-10-22 17:41:42,750 INFO routers.task_router 26 User gabe retrieving all tasks
+2025-10-22 17:41:42,857 INFO routers.task_router 26 User gabe retrieving all tasks
+2025-10-22 17:41:42,859 INFO routers.task_router 43 User gabe retrieving tasks (level: task)
+2025-10-22 17:41:42,970 INFO routers.task_router 43 User gabe retrieving tasks (level: task)
+2025-10-22 17:41:42,973 INFO routers.task_router 62 User gabe retrieving todos (level: todo)
+2025-10-22 17:41:43,085 INFO routers.task_router 62 User gabe retrieving todos (level: todo)
+2025-10-22 17:41:43,093 INFO routers.task_router 81 User gabe retrieving gottados (level: gottado)
+2025-10-22 17:41:43,215 INFO routers.task_router 81 User gabe retrieving gottados (level: gottado)
+2025-10-22 17:41:50,929 INFO routers.ofx_router 168 User gabe retrieving OFX files
+2025-10-22 17:41:50,930 INFO routers.ofx_router 371 User gabe retrieving spending summary
+2025-10-22 17:41:50,931 INFO routers.ofx_router 281 User gabe retrieving transactions
+2025-10-22 17:41:50,990 INFO routers.ofx_router 281 User gabe retrieving transactions
+2025-10-22 17:41:51,043 INFO routers.ofx_router 168 User gabe retrieving OFX files
+2025-10-22 17:41:51,045 INFO routers.ofx_router 371 User gabe retrieving spending summary
+2025-10-22 17:41:53,231 INFO routers.ofx_router 371 User gabe retrieving spending summary
+2025-10-22 17:41:53,232 INFO routers.ofx_router 281 User gabe retrieving transactions
+2025-10-22 17:41:55,341 INFO routers.ofx_router 371 User gabe retrieving spending summary
+2025-10-22 17:41:55,342 INFO routers.ofx_router 281 User gabe retrieving transactions
+2025-10-22 17:41:56,577 INFO routers.ofx_router 371 User gabe retrieving spending summary
+2025-10-22 17:41:56,577 INFO routers.ofx_router 281 User gabe retrieving transactions
+2025-10-22 17:42:06,954 INFO routers.ofx_router 168 User gabe retrieving OFX files
+2025-10-22 17:42:06,956 INFO routers.ofx_router 371 User gabe retrieving spending summary
+2025-10-22 17:42:06,957 INFO routers.ofx_router 281 User gabe retrieving transactions
+2025-10-22 17:42:07,023 INFO routers.ofx_router 281 User gabe retrieving transactions
+2025-10-22 17:42:07,078 INFO routers.ofx_router 168 User gabe retrieving OFX files
+2025-10-22 17:42:07,079 INFO routers.ofx_router 371 User gabe retrieving spending summary
+2025-10-22 17:42:11,195 INFO routers.ofx_router 54 User gabe uploading OFX file: ExportedTransactions.ofx
+2025-10-22 17:42:13,001 INFO routers.ofx_router 116 Successfully parsed 28 transactions from ExportedTransactions.ofx
+2025-10-22 17:42:13,062 INFO routers.ofx_router 168 User gabe retrieving OFX files
+2025-10-22 17:42:13,184 INFO routers.ofx_router 371 User gabe retrieving spending summary
+2025-10-22 17:42:13,300 INFO routers.ofx_router 281 User gabe retrieving transactions
+2025-10-22 17:42:19,029 INFO routers.ofx_router 281 User gabe retrieving transactions
+2025-10-22 17:42:19,978 INFO routers.ofx_router 281 User gabe retrieving transactions
+2025-10-22 17:42:28,968 INFO routers.ofx_router 371 User gabe retrieving spending summary
+2025-10-22 17:42:28,972 INFO routers.ofx_router 281 User gabe retrieving transactions
+2025-10-22 17:42:45,242 INFO routers.ofx_router 281 User gabe retrieving transactions
+2025-10-22 17:42:46,609 INFO routers.ofx_router 281 User gabe retrieving transactions
