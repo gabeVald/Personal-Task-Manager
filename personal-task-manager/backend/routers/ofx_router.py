@@ -22,6 +22,10 @@ from models.budget_target import (
     BudgetTargetRequest,
     is_valid_month,
 )
+from models.merchant_category_rule import (
+    MerchantCategoryRule,
+    MerchantCategoryRuleRequest,
+)
 from models.log import Log
 from auth.jwt_auth import TokenData
 from routers.user_router import get_user
@@ -32,6 +36,7 @@ from csv_transaction_parser import (
     is_pending_status,
     parse_csv_transactions,
 )
+from merchant_category_rules import category_for_merchant
 import logging
 import io
 
@@ -90,6 +95,9 @@ async def upload_ofx_file(
         transaction_count = 0
         duplicate_count = 0
         invalid_rows = []
+        category_rules = await MerchantCategoryRule.find(
+            MerchantCategoryRule.username == current_user.username
+        ).to_list()
 
         if extension == "csv":
             try:
@@ -135,7 +143,11 @@ async def upload_ofx_file(
                     amount=parsed_transaction.amount,
                     transaction_type=parsed_transaction.transaction_type,
                     description=parsed_transaction.description,
-                    category=parsed_transaction.category,
+                    category=category_for_merchant(
+                        parsed_transaction.merchant_payee,
+                        category_rules,
+                        parsed_transaction.category,
+                    ),
                     source_category=parsed_transaction.source_category,
                     source_transaction_id=source_id,
                     posting_status=parsed_transaction.posting_status,
@@ -160,7 +172,9 @@ async def upload_ofx_file(
                         amount=amount,
                         transaction_type="debit" if amount < 0 else "credit",
                         description=tx.memo or "",
-                        category="Uncategorized",
+                        category=category_for_merchant(
+                            tx.payee or "Unknown", category_rules, "Uncategorized"
+                        ),
                         username=current_user.username,
                     )
                     await transaction.insert()
@@ -427,6 +441,128 @@ async def update_transaction_category(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Invalid transaction ID format",
         )
+
+
+def _category_rule_response(rule: MerchantCategoryRule) -> dict:
+    return {
+        "id": str(rule.id),
+        "merchant_match": rule.merchant_match,
+        "category": rule.category,
+    }
+
+
+def _validate_rule_category(category: str) -> None:
+    if category not in (*SPENDING_CATEGORIES, "Uncategorized"):
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail="Choose one of the available spending categories",
+        )
+
+
+@ofx_router.get("/category-rules", status_code=status.HTTP_200_OK)
+async def get_merchant_category_rules(
+    current_user: Annotated[TokenData, Depends(get_user)],
+):
+    """Get merchant category rules belonging to the authenticated user."""
+    rules = await MerchantCategoryRule.find(
+        MerchantCategoryRule.username == current_user.username
+    ).to_list()
+    rules.sort(key=lambda rule: rule.merchant_match.casefold())
+    return [_category_rule_response(rule) for rule in rules]
+
+
+@ofx_router.post("/category-rules", status_code=status.HTTP_200_OK)
+async def create_or_update_merchant_category_rule(
+    rule_request: MerchantCategoryRuleRequest,
+    current_user: Annotated[TokenData, Depends(get_user)],
+):
+    """Create or update a case-insensitive merchant text matching rule."""
+    _validate_rule_category(rule_request.category)
+    rules = await MerchantCategoryRule.find(
+        MerchantCategoryRule.username == current_user.username
+    ).to_list()
+    matching_rule = next(
+        (
+            rule
+            for rule in rules
+            if rule.merchant_match.casefold()
+            == rule_request.merchant_match.casefold()
+        ),
+        None,
+    )
+    if matching_rule:
+        matching_rule.merchant_match = rule_request.merchant_match
+        matching_rule.category = rule_request.category
+        await matching_rule.save()
+        rule = matching_rule
+    else:
+        rule = MerchantCategoryRule(
+            username=current_user.username,
+            merchant_match=rule_request.merchant_match,
+            category=rule_request.category,
+        )
+        await rule.insert()
+    return _category_rule_response(rule)
+
+
+@ofx_router.put("/category-rules/{rule_id}", status_code=status.HTTP_200_OK)
+async def update_merchant_category_rule(
+    rule_id: Annotated[str, Path()],
+    rule_request: MerchantCategoryRuleRequest,
+    current_user: Annotated[TokenData, Depends(get_user)],
+):
+    """Edit an authenticated user's merchant category rule."""
+    _validate_rule_category(rule_request.category)
+    try:
+        rule = await MerchantCategoryRule.get(PydanticObjectId(rule_id))
+    except ValueError:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid rule ID format"
+        )
+    if not rule or rule.username != current_user.username:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Category rule not found or access denied",
+        )
+
+    existing_rules = await MerchantCategoryRule.find(
+        MerchantCategoryRule.username == current_user.username
+    ).to_list()
+    if any(
+        existing.id != rule.id
+        and existing.merchant_match.casefold() == rule_request.merchant_match.casefold()
+        for existing in existing_rules
+    ):
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail="A rule for this merchant text already exists",
+        )
+
+    rule.merchant_match = rule_request.merchant_match
+    rule.category = rule_request.category
+    await rule.save()
+    return _category_rule_response(rule)
+
+
+@ofx_router.delete("/category-rules/{rule_id}", status_code=status.HTTP_200_OK)
+async def delete_merchant_category_rule(
+    rule_id: Annotated[str, Path()],
+    current_user: Annotated[TokenData, Depends(get_user)],
+):
+    """Delete an authenticated user's merchant category rule."""
+    try:
+        rule = await MerchantCategoryRule.get(PydanticObjectId(rule_id))
+    except ValueError:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid rule ID format"
+        )
+    if not rule or rule.username != current_user.username:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Category rule not found or access denied",
+        )
+    await rule.delete()
+    return {"message": "Category rule deleted successfully"}
 
 
 @ofx_router.get("/categories", status_code=status.HTTP_200_OK)

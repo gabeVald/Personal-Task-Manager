@@ -18,6 +18,7 @@ import { BklitCategoryChart } from "@/components/financial-dashboard/BklitCatego
 import { BklitMonthlyTrendChart } from "@/components/financial-dashboard/BklitMonthlyTrendChart";
 import { BudgetTargetsEditor } from "@/components/financial-dashboard/BudgetTargetsEditor";
 import { FinancialStatusCards } from "@/components/financial-dashboard/FinancialStatusCards";
+import { getApiUrl } from "@/lib/api";
 
 // Spending categories
 const SPENDING_CATEGORIES = ["Food, Dining & Entertainment", "Auto, Commute & Travel", "Shopping", "Bills & Subscriptions", "Family & Pets", "Other Expenses", "Health & Personal Care"];
@@ -65,8 +66,10 @@ export default function BudgetPage() {
     const [isDashboardLoading, setIsDashboardLoading] = useState(true);
     const [isTrendLoading, setIsTrendLoading] = useState(true);
     const [isTargetsSaving, setIsTargetsSaving] = useState(false);
+    const [isCategoryRuleSaving, setIsCategoryRuleSaving] = useState(false);
     const [ofxFiles, setOfxFiles] = useState([]);
     const [transactions, setTransactions] = useState([]);
+    const [categoryRules, setCategoryRules] = useState([]);
     const [transactionPage, setTransactionPage] = useState(0);
     const [hasMoreTransactions, setHasMoreTransactions] = useState(false);
     const [spendingSummary, setSpendingSummary] = useState(null);
@@ -76,6 +79,8 @@ export default function BudgetPage() {
     const [selectedMonth, setSelectedMonth] = useState(getCurrentMonthKey);
     const [uploadDialogOpen, setUploadDialogOpen] = useState(false);
     const [csvImportOpen, setCsvImportOpen] = useState(false);
+    const [categoryRuleDialogOpen, setCategoryRuleDialogOpen] = useState(false);
+    const [categoryRuleForm, setCategoryRuleForm] = useState({ id: "", merchant_match: "", category: SPENDING_CATEGORIES[0] });
     const [activeTab, setActiveTab] = useState("overview");
     const [startMonth, setStartMonth] = useState(() => shiftMonthKey(getCurrentMonthKey(), -11));
     const [endMonth, setEndMonth] = useState(getCurrentMonthKey);
@@ -96,7 +101,7 @@ export default function BudgetPage() {
     // Fetch imported statements and CSV files.
     const fetchOFXFiles = async () => {
         try {
-            const response = await fetch("http://127.0.0.1:8000/budget/files", { headers: authHeaders() });
+            const response = await fetch(getApiUrl("/budget/files"), { headers: authHeaders() });
             if (!response.ok) throw new Error("Failed to fetch imported files");
             setOfxFiles(await response.json());
         } catch (error) {
@@ -114,7 +119,7 @@ export default function BudgetPage() {
             params.append("skip", String(page * TRANSACTIONS_PAGE_SIZE));
             params.append("limit", String(TRANSACTIONS_PAGE_SIZE + 1));
 
-            const response = await fetch(`http://127.0.0.1:8000/budget/transactions?${params}`, { headers: authHeaders() });
+            const response = await fetch(getApiUrl(`/budget/transactions?${params}`), { headers: authHeaders() });
             if (!response.ok) throw new Error("Failed to fetch transactions");
             const results = await response.json();
             setTransactions(results.slice(0, TRANSACTIONS_PAGE_SIZE));
@@ -129,7 +134,7 @@ export default function BudgetPage() {
         setIsDashboardLoading(true);
         try {
             const params = new URLSearchParams({ month });
-            const response = await fetch(`http://127.0.0.1:8000/budget/summary?${params}`, { headers: authHeaders() });
+            const response = await fetch(getApiUrl(`/budget/summary?${params}`), { headers: authHeaders() });
             if (!response.ok) throw new Error("Failed to fetch spending summary");
             setSpendingSummary(await response.json());
         } catch (error) {
@@ -143,7 +148,7 @@ export default function BudgetPage() {
     const fetchBudgetTargets = async (month = selectedMonth) => {
         try {
             const params = new URLSearchParams({ month });
-            const response = await fetch(`http://127.0.0.1:8000/budget/targets?${params}`, { headers: authHeaders() });
+            const response = await fetch(getApiUrl(`/budget/targets?${params}`), { headers: authHeaders() });
             if (!response.ok) throw new Error("Failed to fetch budget targets");
             const result = await response.json();
             setBudgetTargets(Array.isArray(result.targets) ? result.targets : []);
@@ -153,12 +158,78 @@ export default function BudgetPage() {
         }
     };
 
+    const fetchCategoryRules = async () => {
+        try {
+            const response = await fetch(getApiUrl("/budget/category-rules"), { headers: authHeaders() });
+            if (!response.ok) throw new Error("Failed to fetch category rules");
+            setCategoryRules(await response.json());
+        } catch (error) {
+            console.error("Error fetching category rules:", error);
+            toast({ title: "Error", description: "Failed to load automatic category rules", variant: "destructive" });
+        }
+    };
+
+    const openCategoryRuleDialog = ({ rule, transaction } = {}) => {
+        setCategoryRuleForm({
+            id: rule?.id || "",
+            merchant_match: rule?.merchant_match || transaction?.merchant_payee || "",
+            category: rule?.category || (transaction?.category && transaction.category !== "Uncategorized" ? transaction.category : SPENDING_CATEGORIES[0]),
+        });
+        setCategoryRuleDialogOpen(true);
+    };
+
+    const saveCategoryRule = async (event) => {
+        event.preventDefault();
+        setIsCategoryRuleSaving(true);
+        try {
+            const isEditing = Boolean(categoryRuleForm.id);
+            const endpoint = isEditing
+                ? getApiUrl(`/budget/category-rules/${categoryRuleForm.id}`)
+                : getApiUrl("/budget/category-rules");
+            const response = await fetch(endpoint, {
+                method: isEditing ? "PUT" : "POST",
+                headers: { ...authHeaders(), "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    merchant_match: categoryRuleForm.merchant_match.trim(),
+                    category: categoryRuleForm.category,
+                }),
+            });
+            const result = await response.json().catch(() => ({}));
+            if (!response.ok) throw new Error(result.detail || "Failed to save category rule");
+            await fetchCategoryRules();
+            setCategoryRuleDialogOpen(false);
+            toast({
+                title: isEditing ? "Default updated" : "Default saved",
+                description: `Future transactions matching “${result.merchant_match}” will use ${result.category}.`,
+            });
+        } catch (error) {
+            toast({ title: "Could not save default", description: error.message, variant: "destructive" });
+        } finally {
+            setIsCategoryRuleSaving(false);
+        }
+    };
+
+    const deleteCategoryRule = async (rule) => {
+        try {
+            const response = await fetch(getApiUrl(`/budget/category-rules/${rule.id}`), {
+                method: "DELETE",
+                headers: authHeaders(),
+            });
+            const result = await response.json().catch(() => ({}));
+            if (!response.ok) throw new Error(result.detail || "Failed to delete category rule");
+            setCategoryRules((currentRules) => currentRules.filter((currentRule) => currentRule.id !== rule.id));
+            toast({ title: "Default removed", description: `New “${rule.merchant_match}” transactions will use their imported category.` });
+        } catch (error) {
+            toast({ title: "Could not remove default", description: error.message, variant: "destructive" });
+        }
+    };
+
     const fetchMultiMonthSummary = async (start = startMonth, end = endMonth) => {
         if (!start || !end || start > end) return;
         setIsTrendLoading(true);
         try {
             const params = new URLSearchParams({ start_month: start, end_month: end });
-            const response = await fetch(`http://127.0.0.1:8000/budget/summary/multi-month?${params}`, { headers: authHeaders() });
+            const response = await fetch(getApiUrl(`/budget/summary/multi-month?${params}`), { headers: authHeaders() });
             if (!response.ok) throw new Error("Failed to fetch trend summary");
             setMultiMonthSummary(await response.json());
         } catch (error) {
@@ -182,7 +253,7 @@ export default function BudgetPage() {
     const saveBudgetTargets = async (targets) => {
         setIsTargetsSaving(true);
         try {
-            const response = await fetch("http://127.0.0.1:8000/budget/targets", {
+            const response = await fetch(getApiUrl("/budget/targets"), {
                 method: "PUT",
                 headers: { ...authHeaders(), "Content-Type": "application/json" },
                 body: JSON.stringify({ month: selectedMonth, targets }),
@@ -222,7 +293,7 @@ export default function BudgetPage() {
             const formData = new FormData();
             formData.append("file", file);
 
-            const response = await fetch("http://127.0.0.1:8000/budget/upload", {
+            const response = await fetch(getApiUrl("/budget/upload"), {
                 method: "POST",
                 headers: {
                     Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -262,7 +333,7 @@ export default function BudgetPage() {
             const formData = new FormData();
             formData.append("file", file);
 
-            const response = await fetch("http://127.0.0.1:8000/budget/upload", {
+            const response = await fetch(getApiUrl("/budget/upload"), {
                 method: "POST",
                 headers: authHeaders(),
                 body: formData,
@@ -287,7 +358,7 @@ export default function BudgetPage() {
     // Update transaction category
     const updateTransactionCategory = async (transactionId, newCategory) => {
         try {
-            const response = await fetch(`http://127.0.0.1:8000/budget/transactions/${transactionId}/category`, {
+            const response = await fetch(getApiUrl(`/budget/transactions/${transactionId}/category`), {
                 method: "PATCH",
                 headers: {
                     Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -327,7 +398,7 @@ export default function BudgetPage() {
         }
 
         try {
-            const response = await fetch(`http://127.0.0.1:8000/budget/files/${fileId}`, {
+            const response = await fetch(getApiUrl(`/budget/files/${fileId}`), {
                 method: "DELETE",
                 headers: {
                     Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -357,6 +428,7 @@ export default function BudgetPage() {
     // Load current-period status, budget targets, transaction details, and the default 12-month trend.
     useEffect(() => {
         fetchOFXFiles();
+        fetchCategoryRules();
         fetchSpendingSummary(selectedMonth);
         fetchBudgetTargets(selectedMonth);
         fetchTransactions("", selectedMonth);
@@ -426,6 +498,51 @@ export default function BudgetPage() {
                 onOpenChange={setCsvImportOpen}
                 open={csvImportOpen}
             />
+
+            <Dialog open={categoryRuleDialogOpen} onOpenChange={setCategoryRuleDialogOpen}>
+                <DialogContent>
+                    <DialogHeader>
+                        <DialogTitle>{categoryRuleForm.id ? "Edit automatic category" : "Set an automatic category"}</DialogTitle>
+                    </DialogHeader>
+                    <form className="space-y-4" onSubmit={saveCategoryRule}>
+                        <p className="text-sm text-muted-foreground">
+                            Matching is case-insensitive and looks for this text anywhere in the merchant name. The rule applies to future imports, takes priority over the bank’s category, and the longest matching rule wins.
+                        </p>
+                        <div className="grid gap-2">
+                            <Label htmlFor="category-rule-merchant">Merchant text to match</Label>
+                            <Input
+                                id="category-rule-merchant"
+                                maxLength={200}
+                                onChange={(event) => setCategoryRuleForm((form) => ({ ...form, merchant_match: event.target.value }))}
+                                placeholder="e.g. Amark"
+                                required
+                                value={categoryRuleForm.merchant_match}
+                            />
+                        </div>
+                        <div className="grid gap-2">
+                            <Label htmlFor="category-rule-category">Default category</Label>
+                            <Select
+                                value={categoryRuleForm.category}
+                                onValueChange={(category) => setCategoryRuleForm((form) => ({ ...form, category }))}
+                            >
+                                <SelectTrigger id="category-rule-category">
+                                    <SelectValue placeholder="Choose a category" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    {SPENDING_CATEGORIES.map((category) => <SelectItem key={category} value={category}>{category}</SelectItem>)}
+                                    <SelectItem value="Uncategorized">Uncategorized</SelectItem>
+                                </SelectContent>
+                            </Select>
+                        </div>
+                        <div className="flex justify-end gap-2">
+                            <Button type="button" variant="outline" onClick={() => setCategoryRuleDialogOpen(false)}>Cancel</Button>
+                            <Button type="submit" disabled={isCategoryRuleSaving || !categoryRuleForm.merchant_match.trim()}>
+                                {isCategoryRuleSaving ? "Saving…" : "Save default"}
+                            </Button>
+                        </div>
+                    </form>
+                </DialogContent>
+            </Dialog>
 
             <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
                 <TabsList>
@@ -554,6 +671,39 @@ export default function BudgetPage() {
                 </TabsContent>
 
                 <TabsContent value="transactions" className="space-y-4">
+                    <Card>
+                        <CardHeader className="flex flex-row items-start justify-between gap-4 space-y-0">
+                            <div>
+                                <CardTitle>Automatic category defaults</CardTitle>
+                                <CardDescription>Rules categorize future imports when the merchant name contains the matching text.</CardDescription>
+                            </div>
+                            <Button variant="outline" onClick={() => openCategoryRuleDialog()}>
+                                Add default
+                            </Button>
+                        </CardHeader>
+                        <CardContent>
+                            {categoryRules.length === 0 ? (
+                                <p className="text-sm text-muted-foreground">No defaults yet. Use “Set default” on a transaction or add one here.</p>
+                            ) : (
+                                <div className="space-y-2">
+                                    {categoryRules.map((rule) => (
+                                        <div key={rule.id} className="flex flex-col gap-2 rounded-md border p-3 sm:flex-row sm:items-center sm:justify-between">
+                                            <p className="min-w-0 flex-1 text-sm">
+                                                <span className="font-medium">{rule.merchant_match}</span>
+                                                <span className="mx-2 text-muted-foreground">→</span>
+                                                <span>{rule.category}</span>
+                                            </p>
+                                            <div className="flex gap-2">
+                                                <Button variant="outline" size="sm" onClick={() => openCategoryRuleDialog({ rule })}>Edit</Button>
+                                                <Button variant="outline" size="sm" onClick={() => deleteCategoryRule(rule)}>Delete</Button>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
+                        </CardContent>
+                    </Card>
+
                     <div className="flex items-center gap-4">
                         <Select
                             value={selectedCategory || "all"}
@@ -630,6 +780,9 @@ export default function BudgetPage() {
                                             <TableCell>
                                                 <Button variant="outline" size="sm" onClick={() => updateTransactionCategory(transaction._id, "Uncategorized")}>
                                                     Reset
+                                                </Button>
+                                                <Button className="ml-2" variant="outline" size="sm" onClick={() => openCategoryRuleDialog({ transaction })}>
+                                                    Set default
                                                 </Button>
                                             </TableCell>
                                         </TableRow>

@@ -16,7 +16,7 @@ source venv/bin/activate
 echo "Starting backend server..."
 # Set window title
 echo -ne "\033]0;Backend Server\007"
-uvicorn main:app --reload
+uvicorn main:app --reload --host 0.0.0.0 --port 8000
 EOL
 
 # Create a script for the frontend process

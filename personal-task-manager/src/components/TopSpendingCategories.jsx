@@ -7,6 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Button } from "@/components/ui/button";
 import { TrendingUp, ChevronDown, ChevronRight } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
+import { getApiUrl } from "@/lib/api";
 
 // Chart configuration for spending categories
 const chartConfig = {
@@ -64,7 +65,7 @@ export function TopSpendingCategories({ spendingData, selectedMonth, onCategoryC
             if (category) params.append("category", category);
             params.append("transaction_type", "debit"); // Only show spending (debits)
 
-            const response = await fetch(`http://127.0.0.1:8000/budget/transactions?${params}`, {
+            const response = await fetch(getApiUrl(`/budget/transactions?${params}`), {
                 headers: {
                     Authorization: `Bearer ${localStorage.getItem("token")}`,
                 },

@@ -13,6 +13,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { ArrowUp, ArrowDown, Calendar, FileImage, AlertCircle } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { DatePicker } from "@/components/ui/date-picker";
+import { getApiUrl } from "@/lib/api";
 
 export function TodoTable({ tasks = [], onTaskUpdate, onMoveItem }) {
     // Filter out completed tasks
@@ -80,7 +81,7 @@ function TaskPopover({ task, onUpdate, index, isFirst, isLast, onMoveUp, onMoveD
     const fetchTaskFiles = async () => {
         try {
             setLoading(true);
-            const response = await fetch(`http://127.0.0.1:8000/todos/files/task/${task._id}?include_data=true`, {
+            const response = await fetch(getApiUrl(`/todos/files/task/${task._id}?include_data=true`), {
                 method: "GET",
                 headers: {
                     Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -103,7 +104,7 @@ function TaskPopover({ task, onUpdate, index, isFirst, isLast, onMoveUp, onMoveD
         try {
             // Update title if changed
             if (title !== task.title) {
-                const titleResponse = await fetch(`http://127.0.0.1:8000/todos/title/${task._id}`, {
+                const titleResponse = await fetch(getApiUrl(`/todos/title/${task._id}`), {
                     method: "PATCH",
                     headers: {
                         Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -119,7 +120,7 @@ function TaskPopover({ task, onUpdate, index, isFirst, isLast, onMoveUp, onMoveD
 
             // Update description if changed
             if (description !== task.description) {
-                const descResponse = await fetch(`http://127.0.0.1:8000/todos/desc/${task._id}`, {
+                const descResponse = await fetch(getApiUrl(`/todos/desc/${task._id}`), {
                     method: "PATCH",
                     headers: {
                         Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -135,7 +136,7 @@ function TaskPopover({ task, onUpdate, index, isFirst, isLast, onMoveUp, onMoveD
 
             // Update level if changed
             if (level !== task.level) {
-                const levelResponse = await fetch(`http://127.0.0.1:8000/todos/level/${task._id}?level=${level}`, {
+                const levelResponse = await fetch(getApiUrl(`/todos/level/${task._id}?level=${level}`), {
                     method: "PATCH",
                     headers: {
                         Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -150,7 +151,7 @@ function TaskPopover({ task, onUpdate, index, isFirst, isLast, onMoveUp, onMoveD
 
             // Update due date if changed
             if (dueDate.toISOString() !== new Date(task.expired_date).toISOString()) {
-                const dateResponse = await fetch(`http://127.0.0.1:8000/todos/expired_date/${task._id}`, {
+                const dateResponse = await fetch(getApiUrl(`/todos/expired_date/${task._id}`), {
                     method: "PATCH",
                     headers: {
                         Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -180,7 +181,7 @@ function TaskPopover({ task, onUpdate, index, isFirst, isLast, onMoveUp, onMoveD
     const handleDelete = async () => {
         if (confirm("Are you sure you want to delete this task?")) {
             try {
-                const response = await fetch(`http://127.0.0.1:8000/todos/${task._id}`, {
+                const response = await fetch(getApiUrl(`/todos/${task._id}`), {
                     method: "DELETE",
                     headers: {
                         Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -205,7 +206,7 @@ function TaskPopover({ task, onUpdate, index, isFirst, isLast, onMoveUp, onMoveD
 
     const handleMarkComplete = async () => {
         try {
-            const response = await fetch(`http://127.0.0.1:8000/todos/completed/${task._id}`, {
+            const response = await fetch(getApiUrl(`/todos/completed/${task._id}`), {
                 method: "PATCH",
                 headers: {
                     Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -230,7 +231,7 @@ function TaskPopover({ task, onUpdate, index, isFirst, isLast, onMoveUp, onMoveD
 
     const handlePriorityToggle = async () => {
         try {
-            const response = await fetch(`http://127.0.0.1:8000/todos/high_priority/${task._id}`, {
+            const response = await fetch(getApiUrl(`/todos/high_priority/${task._id}`), {
                 method: "PATCH",
                 headers: {
                     Authorization: `Bearer ${localStorage.getItem("token")}`,

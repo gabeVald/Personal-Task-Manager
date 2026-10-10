@@ -8,6 +8,7 @@ from models.log import Log
 from models.file import File
 from models.ofx_file import OFXFile, Transaction
 from models.budget_target import BudgetTarget
+from models.merchant_category_rule import MerchantCategoryRule
 
 from motor.motor_asyncio import AsyncIOMotorClient
 import certifi
@@ -28,6 +29,15 @@ async def init_database():
     db = client["gottaDo_app"]
     await init_beanie(
         database=db,
-        document_models=[User, Task, Log, File, OFXFile, Transaction, BudgetTarget],
+        document_models=[
+            User,
+            Task,
+            Log,
+            File,
+            OFXFile,
+            Transaction,
+            BudgetTarget,
+            MerchantCategoryRule,
+        ],
     )
     logger.info("database started")

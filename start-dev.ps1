@@ -25,7 +25,7 @@ if (-not (Test-Path ".env")) {
     Write-Host "Warning: .env file not found in backend directory - this will cause login issues" -ForegroundColor Red
 }
 # Start the server in the same directory context (important for .env file path resolution)
-uvicorn main:app --reload
+uvicorn main:app --reload --host 0.0.0.0 --port 8000
 "@
 
 $backendProcess = Start-Process powershell -ArgumentList "-NoExit", "-Command", $backendScript -WindowStyle Normal -PassThru

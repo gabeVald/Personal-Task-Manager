@@ -36,6 +36,24 @@ I chose Shadcn because of how customizable the components are, allowing full con
 
 ## Frontend
 
+### Access from another device on your LAN
+
+Start the services from the repository root with `./start-dev.sh` on Linux or `./start-dev.ps1` on Windows.
+
+1. Give the computer running the app a stable LAN hostname through your router's local DNS, or find its private Wi-Fi IPv4 address in its network settings and reserve that address in the router's DHCP settings.
+2. Put both devices on the same Wi-Fi network. Avoid guest Wi-Fi and disable client/AP isolation so devices can reach each other.
+3. Allow inbound TCP ports **3000** (frontend) and **8000** (backend) through the computer's firewall on the private/LAN network.
+4. From both the host computer and phone, open `http://<LAN-host>:3000` (for example, `http://192.168.1.42:3000`). Do not use `localhost` on the phone; that refers to the phone itself.
+5. In `personal-task-manager/backend/.env`, set `FRONTEND_ORIGINS` to the comma-separated frontend origins, including the LAN origin, for example:
+
+   ```env
+   FRONTEND_ORIGINS=http://localhost:3000,http://192.168.1.42:3000
+   ```
+
+   FastAPI reads this comma-separated setting and includes these origins in its CORS allowlist (along with localhost defaults). The frontend calls the backend on the same hostname at port `8000`, so use the stable LAN hostname/IP in the page URL.
+
+This is plain HTTP intended only for a trusted LAN; do not forward either port through your router to the public internet. Each browser/device has its own local login session and must sign in separately.
+
 ### Shadcn UI
 
 The project uses Shadcn UI, a collection of reusable components built with Radix UI and Tailwind CSS. These components are completely customizable and allow for a consistent design language throughout the application.
@@ -190,4 +208,3 @@ Handles file operations:
 ### Log Router (`log_router.py`)
 
 Manages system logs and activity tracking.
-

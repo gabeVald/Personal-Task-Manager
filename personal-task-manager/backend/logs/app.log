@@ -945,3 +945,236 @@
 2026-10-09 19:37:33,729 INFO routers.ofx_router 500 User testuser retrieving spending summary
 2026-10-09 19:37:33,759 INFO routers.ofx_router 343 User testuser retrieving transactions
 2026-10-09 19:37:33,765 INFO routers.ofx_router 587 User testuser retrieving multi-month spending summary
+2026-10-09 19:40:21,603 INFO routers.ofx_router 390 User testuser updating transaction 6ac9838bfa5adc6781d0af0a category
+2026-10-09 19:40:21,734 INFO routers.ofx_router 587 User testuser retrieving multi-month spending summary
+2026-10-09 19:40:21,739 INFO routers.ofx_router 500 User testuser retrieving spending summary
+2026-10-09 19:40:21,746 INFO routers.ofx_router 343 User testuser retrieving transactions
+2026-10-09 19:40:25,770 INFO routers.ofx_router 390 User testuser updating transaction 6ac9838bfa5adc6781d0af0b category
+2026-10-09 19:40:25,915 INFO routers.ofx_router 343 User testuser retrieving transactions
+2026-10-09 19:40:25,919 INFO routers.ofx_router 500 User testuser retrieving spending summary
+2026-10-09 19:40:25,921 INFO routers.ofx_router 587 User testuser retrieving multi-month spending summary
+2026-10-09 19:40:33,665 INFO routers.ofx_router 390 User testuser updating transaction 6ac9838bfa5adc6781d0af0c category
+2026-10-09 19:40:33,777 INFO routers.ofx_router 587 User testuser retrieving multi-month spending summary
+2026-10-09 19:40:33,780 INFO routers.ofx_router 500 User testuser retrieving spending summary
+2026-10-09 19:40:33,784 INFO routers.ofx_router 343 User testuser retrieving transactions
+2026-10-09 19:40:38,523 INFO routers.ofx_router 390 User testuser updating transaction 6ac9838bfa5adc6781d0af0d category
+2026-10-09 19:40:38,605 INFO routers.ofx_router 500 User testuser retrieving spending summary
+2026-10-09 19:40:38,615 INFO routers.ofx_router 343 User testuser retrieving transactions
+2026-10-09 19:40:38,618 INFO routers.ofx_router 587 User testuser retrieving multi-month spending summary
+2026-10-09 19:40:41,844 INFO routers.ofx_router 390 User testuser updating transaction 6ac9838bfa5adc6781d0af0e category
+2026-10-09 19:40:41,949 INFO routers.ofx_router 500 User testuser retrieving spending summary
+2026-10-09 19:40:41,952 INFO routers.ofx_router 343 User testuser retrieving transactions
+2026-10-09 19:40:41,953 INFO routers.ofx_router 587 User testuser retrieving multi-month spending summary
+2026-10-09 19:40:47,716 INFO routers.ofx_router 390 User testuser updating transaction 6ac9838bfa5adc6781d0af0f category
+2026-10-09 19:40:47,819 INFO routers.ofx_router 500 User testuser retrieving spending summary
+2026-10-09 19:40:47,825 INFO routers.ofx_router 343 User testuser retrieving transactions
+2026-10-09 19:40:47,826 INFO routers.ofx_router 587 User testuser retrieving multi-month spending summary
+2026-10-09 19:45:21,642 INFO routers.ofx_router 390 User testuser updating transaction 6ac9838cfa5adc6781d0af36 category
+2026-10-09 19:45:21,763 INFO routers.ofx_router 500 User testuser retrieving spending summary
+2026-10-09 19:45:21,778 INFO routers.ofx_router 343 User testuser retrieving transactions
+2026-10-09 19:45:21,781 INFO routers.ofx_router 587 User testuser retrieving multi-month spending summary
+2026-10-09 19:45:24,658 INFO routers.ofx_router 390 User testuser updating transaction 6ac9838cfa5adc6781d0af35 category
+2026-10-09 19:45:24,797 INFO routers.ofx_router 500 User testuser retrieving spending summary
+2026-10-09 19:45:24,814 INFO routers.ofx_router 343 User testuser retrieving transactions
+2026-10-09 19:45:24,819 INFO routers.ofx_router 587 User testuser retrieving multi-month spending summary
+2026-10-09 19:45:29,671 INFO routers.ofx_router 390 User testuser updating transaction 6ac9838cfa5adc6781d0af32 category
+2026-10-09 19:45:29,781 INFO routers.ofx_router 500 User testuser retrieving spending summary
+2026-10-09 19:45:29,783 INFO routers.ofx_router 343 User testuser retrieving transactions
+2026-10-09 19:45:29,784 INFO routers.ofx_router 587 User testuser retrieving multi-month spending summary
+2026-10-09 19:45:32,265 INFO routers.ofx_router 390 User testuser updating transaction 6ac9838cfa5adc6781d0af31 category
+2026-10-09 19:45:32,407 INFO routers.ofx_router 500 User testuser retrieving spending summary
+2026-10-09 19:45:32,415 INFO routers.ofx_router 343 User testuser retrieving transactions
+2026-10-09 19:45:32,418 INFO routers.ofx_router 587 User testuser retrieving multi-month spending summary
+2026-10-09 19:45:34,740 INFO routers.ofx_router 390 User testuser updating transaction 6ac9838cfa5adc6781d0af30 category
+2026-10-09 19:45:35,013 INFO routers.ofx_router 587 User testuser retrieving multi-month spending summary
+2026-10-09 19:45:35,015 INFO routers.ofx_router 500 User testuser retrieving spending summary
+2026-10-09 19:45:35,021 INFO routers.ofx_router 343 User testuser retrieving transactions
+2026-10-09 19:45:38,050 INFO routers.ofx_router 390 User testuser updating transaction 6ac9838cfa5adc6781d0af2f category
+2026-10-09 19:45:38,172 INFO routers.ofx_router 500 User testuser retrieving spending summary
+2026-10-09 19:45:38,175 INFO routers.ofx_router 343 User testuser retrieving transactions
+2026-10-09 19:45:38,187 INFO routers.ofx_router 587 User testuser retrieving multi-month spending summary
+2026-10-09 19:45:47,838 INFO routers.ofx_router 390 User testuser updating transaction 6ac9838cfa5adc6781d0af29 category
+2026-10-09 19:45:47,947 INFO routers.ofx_router 500 User testuser retrieving spending summary
+2026-10-09 19:45:47,950 INFO routers.ofx_router 343 User testuser retrieving transactions
+2026-10-09 19:45:47,955 INFO routers.ofx_router 587 User testuser retrieving multi-month spending summary
+2026-10-09 19:45:51,335 INFO routers.ofx_router 390 User testuser updating transaction 6ac9838cfa5adc6781d0af2c category
+2026-10-09 19:45:51,419 INFO routers.ofx_router 500 User testuser retrieving spending summary
+2026-10-09 19:45:51,421 INFO routers.ofx_router 343 User testuser retrieving transactions
+2026-10-09 19:45:51,426 INFO routers.ofx_router 587 User testuser retrieving multi-month spending summary
+2026-10-09 19:45:54,464 INFO routers.ofx_router 390 User testuser updating transaction 6ac9838cfa5adc6781d0af2d category
+2026-10-09 19:45:54,596 INFO routers.ofx_router 500 User testuser retrieving spending summary
+2026-10-09 19:45:54,602 INFO routers.ofx_router 343 User testuser retrieving transactions
+2026-10-09 19:45:54,607 INFO routers.ofx_router 587 User testuser retrieving multi-month spending summary
+2026-10-09 19:45:56,854 INFO routers.ofx_router 390 User testuser updating transaction 6ac9838cfa5adc6781d0af2e category
+2026-10-09 19:45:56,925 INFO routers.ofx_router 500 User testuser retrieving spending summary
+2026-10-09 19:45:56,931 INFO routers.ofx_router 587 User testuser retrieving multi-month spending summary
+2026-10-09 19:45:56,933 INFO routers.ofx_router 343 User testuser retrieving transactions
+2026-10-09 19:45:58,746 INFO routers.ofx_router 390 User testuser updating transaction 6ac9838cfa5adc6781d0af2a category
+2026-10-09 19:45:58,877 INFO routers.ofx_router 587 User testuser retrieving multi-month spending summary
+2026-10-09 19:45:58,878 INFO routers.ofx_router 500 User testuser retrieving spending summary
+2026-10-09 19:45:58,881 INFO routers.ofx_router 343 User testuser retrieving transactions
+2026-10-09 19:46:05,360 INFO routers.ofx_router 390 User testuser updating transaction 6ac9838cfa5adc6781d0af26 category
+2026-10-09 19:46:05,479 INFO routers.ofx_router 500 User testuser retrieving spending summary
+2026-10-09 19:46:05,502 INFO routers.ofx_router 343 User testuser retrieving transactions
+2026-10-09 19:46:05,513 INFO routers.ofx_router 587 User testuser retrieving multi-month spending summary
+2026-10-09 19:46:07,156 INFO routers.ofx_router 390 User testuser updating transaction 6ac9838cfa5adc6781d0af25 category
+2026-10-09 19:46:07,263 INFO routers.ofx_router 500 User testuser retrieving spending summary
+2026-10-09 19:46:07,276 INFO routers.ofx_router 587 User testuser retrieving multi-month spending summary
+2026-10-09 19:46:07,279 INFO routers.ofx_router 343 User testuser retrieving transactions
+2026-10-09 19:46:09,329 INFO routers.ofx_router 390 User testuser updating transaction 6ac9838cfa5adc6781d0af24 category
+2026-10-09 19:46:09,495 INFO routers.ofx_router 500 User testuser retrieving spending summary
+2026-10-09 19:46:09,503 INFO routers.ofx_router 343 User testuser retrieving transactions
+2026-10-09 19:46:09,511 INFO routers.ofx_router 587 User testuser retrieving multi-month spending summary
+2026-10-09 19:46:11,630 INFO routers.ofx_router 390 User testuser updating transaction 6ac9838cfa5adc6781d0af23 category
+2026-10-09 19:46:12,585 INFO routers.ofx_router 500 User testuser retrieving spending summary
+2026-10-09 19:46:12,589 INFO routers.ofx_router 343 User testuser retrieving transactions
+2026-10-09 19:46:12,601 INFO routers.ofx_router 587 User testuser retrieving multi-month spending summary
+2026-10-09 19:46:14,550 INFO routers.ofx_router 390 User testuser updating transaction 6ac9838cfa5adc6781d0af1f category
+2026-10-09 19:46:14,702 INFO routers.ofx_router 343 User testuser retrieving transactions
+2026-10-09 19:46:14,708 INFO routers.ofx_router 500 User testuser retrieving spending summary
+2026-10-09 19:46:14,714 INFO routers.ofx_router 587 User testuser retrieving multi-month spending summary
+2026-10-09 19:46:27,165 INFO routers.ofx_router 390 User testuser updating transaction 6ac9838cfa5adc6781d0af21 category
+2026-10-09 19:46:27,294 INFO routers.ofx_router 500 User testuser retrieving spending summary
+2026-10-09 19:46:27,305 INFO routers.ofx_router 343 User testuser retrieving transactions
+2026-10-09 19:46:27,313 INFO routers.ofx_router 587 User testuser retrieving multi-month spending summary
+2026-10-09 19:46:30,590 INFO routers.ofx_router 390 User testuser updating transaction 6ac9838cfa5adc6781d0af1f category
+2026-10-09 19:46:30,701 INFO routers.ofx_router 500 User testuser retrieving spending summary
+2026-10-09 19:46:30,702 INFO routers.ofx_router 587 User testuser retrieving multi-month spending summary
+2026-10-09 19:46:30,704 INFO routers.ofx_router 343 User testuser retrieving transactions
+2026-10-09 19:46:35,662 INFO routers.ofx_router 390 User testuser updating transaction 6ac9838cfa5adc6781d0af1d category
+2026-10-09 19:46:35,759 INFO routers.ofx_router 500 User testuser retrieving spending summary
+2026-10-09 19:46:35,772 INFO routers.ofx_router 343 User testuser retrieving transactions
+2026-10-09 19:46:35,777 INFO routers.ofx_router 587 User testuser retrieving multi-month spending summary
+2026-10-09 19:46:40,267 INFO routers.ofx_router 390 User testuser updating transaction 6ac9838cfa5adc6781d0af1e category
+2026-10-09 19:46:40,301 INFO routers.ofx_router 500 User testuser retrieving spending summary
+2026-10-09 19:46:40,303 INFO routers.ofx_router 587 User testuser retrieving multi-month spending summary
+2026-10-09 19:46:40,305 INFO routers.ofx_router 343 User testuser retrieving transactions
+2026-10-09 19:46:43,133 INFO routers.ofx_router 390 User testuser updating transaction 6ac9838cfa5adc6781d0af20 category
+2026-10-09 19:46:43,238 INFO routers.ofx_router 343 User testuser retrieving transactions
+2026-10-09 19:46:43,240 INFO routers.ofx_router 500 User testuser retrieving spending summary
+2026-10-09 19:46:43,243 INFO routers.ofx_router 587 User testuser retrieving multi-month spending summary
+2026-10-09 19:46:48,209 INFO routers.ofx_router 390 User testuser updating transaction 6ac9838bfa5adc6781d0af1c category
+2026-10-09 19:46:48,313 INFO routers.ofx_router 500 User testuser retrieving spending summary
+2026-10-09 19:46:48,318 INFO routers.ofx_router 343 User testuser retrieving transactions
+2026-10-09 19:46:48,324 INFO routers.ofx_router 587 User testuser retrieving multi-month spending summary
+2026-10-09 19:46:50,433 INFO routers.ofx_router 390 User testuser updating transaction 6ac9838bfa5adc6781d0af1b category
+2026-10-09 19:46:50,546 INFO routers.ofx_router 500 User testuser retrieving spending summary
+2026-10-09 19:46:50,561 INFO routers.ofx_router 343 User testuser retrieving transactions
+2026-10-09 19:46:50,563 INFO routers.ofx_router 587 User testuser retrieving multi-month spending summary
+2026-10-09 19:46:52,843 INFO routers.ofx_router 390 User testuser updating transaction 6ac9838bfa5adc6781d0af19 category
+2026-10-09 19:46:52,959 INFO routers.ofx_router 500 User testuser retrieving spending summary
+2026-10-09 19:46:52,974 INFO routers.ofx_router 343 User testuser retrieving transactions
+2026-10-09 19:46:52,980 INFO routers.ofx_router 587 User testuser retrieving multi-month spending summary
+2026-10-09 19:46:59,178 INFO routers.ofx_router 390 User testuser updating transaction 6ac9838bfa5adc6781d0af17 category
+2026-10-09 19:47:00,265 INFO routers.ofx_router 500 User testuser retrieving spending summary
+2026-10-09 19:47:00,272 INFO routers.ofx_router 343 User testuser retrieving transactions
+2026-10-09 19:47:00,278 INFO routers.ofx_router 587 User testuser retrieving multi-month spending summary
+2026-10-09 19:47:03,893 INFO routers.ofx_router 390 User testuser updating transaction 6ac9838bfa5adc6781d0af15 category
+2026-10-09 19:47:04,029 INFO routers.ofx_router 500 User testuser retrieving spending summary
+2026-10-09 19:47:04,030 INFO routers.ofx_router 587 User testuser retrieving multi-month spending summary
+2026-10-09 19:47:04,032 INFO routers.ofx_router 343 User testuser retrieving transactions
+2026-10-09 19:47:06,474 INFO routers.ofx_router 390 User testuser updating transaction 6ac9838bfa5adc6781d0af14 category
+2026-10-09 19:47:06,588 INFO routers.ofx_router 500 User testuser retrieving spending summary
+2026-10-09 19:47:06,594 INFO routers.ofx_router 343 User testuser retrieving transactions
+2026-10-09 19:47:06,597 INFO routers.ofx_router 587 User testuser retrieving multi-month spending summary
+2026-10-09 19:47:10,270 INFO routers.ofx_router 390 User testuser updating transaction 6ac9838bfa5adc6781d0af13 category
+2026-10-09 19:47:10,320 INFO routers.ofx_router 587 User testuser retrieving multi-month spending summary
+2026-10-09 19:47:10,323 INFO routers.ofx_router 500 User testuser retrieving spending summary
+2026-10-09 19:47:10,327 INFO routers.ofx_router 343 User testuser retrieving transactions
+2026-10-09 19:47:12,212 INFO routers.ofx_router 390 User testuser updating transaction 6ac9838bfa5adc6781d0af12 category
+2026-10-09 19:47:12,315 INFO routers.ofx_router 500 User testuser retrieving spending summary
+2026-10-09 19:47:12,321 INFO routers.ofx_router 343 User testuser retrieving transactions
+2026-10-09 19:47:12,325 INFO routers.ofx_router 587 User testuser retrieving multi-month spending summary
+2026-10-09 19:47:14,461 INFO routers.ofx_router 390 User testuser updating transaction 6ac9838bfa5adc6781d0af10 category
+2026-10-09 19:47:14,569 INFO routers.ofx_router 500 User testuser retrieving spending summary
+2026-10-09 19:47:14,571 INFO routers.ofx_router 343 User testuser retrieving transactions
+2026-10-09 19:47:14,583 INFO routers.ofx_router 587 User testuser retrieving multi-month spending summary
+2026-10-09 19:47:18,646 INFO routers.ofx_router 390 User testuser updating transaction 6ac9838bfa5adc6781d0af11 category
+2026-10-09 19:47:18,749 INFO routers.ofx_router 500 User testuser retrieving spending summary
+2026-10-09 19:47:18,752 INFO routers.ofx_router 343 User testuser retrieving transactions
+2026-10-09 19:47:18,755 INFO routers.ofx_router 587 User testuser retrieving multi-month spending summary
+2026-10-09 19:57:32,553 INFO routers.ofx_router 228 User testuser retrieving OFX files
+2026-10-09 19:57:32,574 INFO routers.ofx_router 500 User testuser retrieving spending summary
+2026-10-09 19:57:32,587 INFO routers.ofx_router 587 User testuser retrieving multi-month spending summary
+2026-10-09 19:57:32,598 INFO routers.ofx_router 343 User testuser retrieving transactions
+2026-10-09 19:57:32,972 INFO routers.ofx_router 228 User testuser retrieving OFX files
+2026-10-09 19:57:32,982 INFO routers.ofx_router 343 User testuser retrieving transactions
+2026-10-09 19:57:32,999 INFO routers.ofx_router 500 User testuser retrieving spending summary
+2026-10-09 19:57:33,112 INFO routers.ofx_router 587 User testuser retrieving multi-month spending summary
+2026-10-09 20:00:17,939 INFO routers.ofx_router 228 User testuser retrieving OFX files
+2026-10-09 20:00:17,957 INFO routers.ofx_router 500 User testuser retrieving spending summary
+2026-10-09 20:00:18,072 INFO routers.ofx_router 587 User testuser retrieving multi-month spending summary
+2026-10-09 20:00:18,081 INFO routers.ofx_router 343 User testuser retrieving transactions
+2026-10-09 21:04:59,439 WARN routers.user_router 35 Invalid token or token expired
+2026-10-09 21:04:59,478 WARN routers.user_router 35 Invalid token or token expired
+2026-10-09 21:04:59,484 WARN routers.user_router 35 Invalid token or token expired
+2026-10-09 21:04:59,503 WARN routers.user_router 35 Invalid token or token expired
+2026-10-09 21:04:59,521 WARN routers.user_router 35 Invalid token or token expired
+2026-10-09 21:24:03,576 INFO main 34 Application Shuts down
+2026-10-09 21:24:11,495 INFO main 31 Application Starts...
+2026-10-09 21:24:19,224 INFO __name__ 43 database started
+2026-10-09 21:24:53,511 WARN routers.user_router 35 Invalid token or token expired
+2026-10-09 21:24:53,512 WARN routers.user_router 35 Invalid token or token expired
+2026-10-09 21:24:53,517 WARN routers.user_router 35 Invalid token or token expired
+2026-10-09 21:24:53,523 WARN routers.user_router 35 Invalid token or token expired
+2026-10-09 21:24:53,523 WARN routers.user_router 35 Invalid token or token expired
+2026-10-09 21:24:53,525 WARN routers.user_router 35 Invalid token or token expired
+2026-10-09 21:24:53,567 WARN routers.user_router 35 Invalid token or token expired
+2026-10-09 21:24:53,568 WARN routers.user_router 35 Invalid token or token expired
+2026-10-09 21:24:53,569 WARN routers.user_router 35 Invalid token or token expired
+2026-10-09 21:24:53,570 WARN routers.user_router 35 Invalid token or token expired
+2026-10-09 21:24:53,571 WARN routers.user_router 35 Invalid token or token expired
+2026-10-09 21:24:53,575 WARN routers.user_router 35 Invalid token or token expired
+2026-10-09 21:36:58,768 INFO main 35 Application Shuts down
+2026-10-09 21:37:04,658 INFO main 31 Application Starts...
+2026-10-09 21:40:33,334 INFO main 31 Application Starts...
+2026-10-09 21:40:33,525 INFO __name__ 43 database started
+2026-10-09 21:55:31,263 INFO main 35 Application Shuts down
+2026-10-09 21:55:36,830 INFO main 31 Application Starts...
+2026-10-09 21:55:36,934 INFO __name__ 43 database started
+2026-10-09 21:56:22,304 WARN routers.user_router 35 Invalid token or token expired
+2026-10-09 21:56:22,308 WARN routers.user_router 35 Invalid token or token expired
+2026-10-09 21:56:22,310 WARN routers.user_router 35 Invalid token or token expired
+2026-10-09 21:56:22,316 WARN routers.user_router 35 Invalid token or token expired
+2026-10-09 21:56:22,332 WARN routers.user_router 35 Invalid token or token expired
+2026-10-09 21:56:22,347 WARN routers.user_router 35 Invalid token or token expired
+2026-10-09 21:56:22,383 WARN routers.user_router 35 Invalid token or token expired
+2026-10-09 21:56:22,384 WARN routers.user_router 35 Invalid token or token expired
+2026-10-09 21:56:22,385 WARN routers.user_router 35 Invalid token or token expired
+2026-10-09 21:56:22,387 WARN routers.user_router 35 Invalid token or token expired
+2026-10-09 21:56:22,418 WARN routers.user_router 35 Invalid token or token expired
+2026-10-09 21:56:22,423 WARN routers.user_router 35 Invalid token or token expired
+2026-10-09 22:11:08,189 INFO main 35 Application Shuts down
+2026-10-09 22:13:12,031 INFO main 31 Application Starts...
+2026-10-09 22:13:12,084 INFO __name__ 43 database started
+2026-10-09 22:13:13,394 INFO main 35 Application Shuts down
+2026-10-09 22:30:16,849 INFO main 31 Application Starts...
+2026-10-09 22:30:17,483 INFO __name__ 43 database started
+2026-10-09 22:30:25,087 INFO routers.user_router 91 Sign-in attempt for username: testuser
+2026-10-09 22:30:26,174 INFO routers.user_router 108 User testuser logged in successfully
+2026-10-09 22:30:26,649 INFO routers.task_router 26 User testuser retrieving all tasks
+2026-10-09 22:30:26,752 INFO routers.task_router 26 User testuser retrieving all tasks
+2026-10-09 22:30:26,819 INFO routers.task_router 43 User testuser retrieving tasks (level: task)
+2026-10-09 22:30:26,911 INFO routers.task_router 43 User testuser retrieving tasks (level: task)
+2026-10-09 22:30:26,982 INFO routers.task_router 62 User testuser retrieving todos (level: todo)
+2026-10-09 22:30:27,011 INFO routers.task_router 62 User testuser retrieving todos (level: todo)
+2026-10-09 22:30:27,047 INFO routers.task_router 81 User testuser retrieving gottados (level: gottado)
+2026-10-09 22:30:27,144 INFO routers.task_router 81 User testuser retrieving gottados (level: gottado)
+2026-10-09 22:34:18,297 INFO routers.user_router 91 Sign-in attempt for username: testuser
+2026-10-09 22:34:19,073 INFO routers.user_router 108 User testuser logged in successfully
+2026-10-09 22:34:20,335 INFO routers.task_router 26 User testuser retrieving all tasks
+2026-10-09 22:34:20,539 INFO routers.task_router 26 User testuser retrieving all tasks
+2026-10-09 22:34:20,885 INFO routers.task_router 43 User testuser retrieving tasks (level: task)
+2026-10-09 22:34:20,998 INFO routers.task_router 43 User testuser retrieving tasks (level: task)
+2026-10-09 22:34:21,093 INFO routers.task_router 62 User testuser retrieving todos (level: todo)
+2026-10-09 22:34:21,167 INFO routers.task_router 62 User testuser retrieving todos (level: todo)
+2026-10-09 22:34:21,187 INFO routers.task_router 81 User testuser retrieving gottados (level: gottado)
+2026-10-09 22:34:21,234 INFO routers.task_router 81 User testuser retrieving gottados (level: gottado)
+2026-10-09 22:34:40,082 INFO routers.ofx_router 242 User testuser retrieving OFX files
+2026-10-09 22:34:40,085 INFO routers.ofx_router 242 User testuser retrieving OFX files
+2026-10-09 22:34:40,149 INFO routers.ofx_router 636 User testuser retrieving spending summary
+2026-10-09 22:34:40,157 INFO routers.ofx_router 636 User testuser retrieving spending summary
+2026-10-09 22:34:40,268 INFO routers.ofx_router 357 User testuser retrieving transactions
+2026-10-09 22:34:40,301 INFO routers.ofx_router 357 User testuser retrieving transactions
+2026-10-09 22:34:40,417 INFO routers.ofx_router 723 User testuser retrieving multi-month spending summary
+2026-10-09 22:34:40,421 INFO routers.ofx_router 723 User testuser retrieving multi-month spending summary

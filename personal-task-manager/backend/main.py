@@ -17,6 +17,7 @@ from routers.log_router import log_router
 from routers.ofx_router import ofx_router
 
 from logging_setup import setup_logging
+from models.my_config import get_frontend_origins
 
 # to auto load the database
 
@@ -39,7 +40,7 @@ app = FastAPI(Title="", version="2.0.0", lifespan=lifespan)
 # Add CORS middleware with proper configuration
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000", "http://localhost:3001"],
+    allow_origins=list(get_frontend_origins()),
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

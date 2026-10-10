@@ -17,6 +17,7 @@ import { ToastProvider } from "@/components/ui/toast";
 import { UserListDialog } from "@/components/UserListDialog";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Toaster } from "@/components/ui/toaster";
+import { getApiUrl } from "@/lib/api";
 
 // Function to decode JWT token
 const decodeJWT = (token) => {
@@ -110,7 +111,7 @@ export default function Home() {
             };
 
             // All tasks
-            const allResponse = await fetch("http://127.0.0.1:8000/todos/all", {
+            const allResponse = await fetch(getApiUrl("/todos/all"), {
                 headers,
             });
 
@@ -131,7 +132,7 @@ export default function Home() {
 
             // Tasks
             const tasksResponse = await fetch(
-                "http://127.0.0.1:8000/todos/tasks",
+                getApiUrl("/todos/tasks"),
                 { headers }
             );
             const tasksData = await tasksResponse.json();
@@ -146,7 +147,7 @@ export default function Home() {
 
             // Todos
             const todosResponse = await fetch(
-                "http://127.0.0.1:8000/todos/todos",
+                getApiUrl("/todos/todos"),
                 { headers }
             );
             const todosData = await todosResponse.json();
@@ -161,7 +162,7 @@ export default function Home() {
 
             // Gottados
             const gottadosResponse = await fetch(
-                "http://127.0.0.1:8000/todos/gottados",
+                getApiUrl("/todos/gottados"),
                 { headers }
             );
             const gottadosData = await gottadosResponse.json();

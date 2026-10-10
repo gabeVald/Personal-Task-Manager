@@ -21,6 +21,7 @@ import {
 import { DatePicker } from "@/components/ui/date-picker";
 import { Separator } from "@/components/ui/separator";
 import { AlertCircle, FileUp, PlusCircle } from "lucide-react";
+import { getApiUrl } from "@/lib/api";
 
 export function CreateTaskDialog({ onTaskCreated }) {
     const [title, setTitle] = useState("New Task");
@@ -79,7 +80,7 @@ export function CreateTaskDialog({ onTaskCreated }) {
 
             // Send task creation request
             const taskResponse = await fetch(
-                "http://127.0.0.1:8000/todos/create",
+                getApiUrl("/todos/create"),
                 {
                     method: "POST",
                     headers: {
@@ -106,7 +107,7 @@ export function CreateTaskDialog({ onTaskCreated }) {
 
                     try {
                         const fileResponse = await fetch(
-                            "http://127.0.0.1:8000/todos/files/upload",
+                            getApiUrl("/todos/files/upload"),
                             {
                                 method: "POST",
                                 headers: {

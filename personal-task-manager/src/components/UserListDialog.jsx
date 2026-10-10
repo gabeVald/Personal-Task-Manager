@@ -51,6 +51,7 @@ import {
     AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { Separator } from "@/components/ui/separator";
+import { getApiUrl } from "@/lib/api";
 
 export function UserListDialog() {
     const [users, setUsers] = useState([]);
@@ -67,7 +68,7 @@ export function UserListDialog() {
         try {
             setLoading(true);
             const token = localStorage.getItem("token");
-            const response = await fetch("http://127.0.0.1:8000/users/all", {
+            const response = await fetch(getApiUrl("/users/all"), {
                 headers: {
                     Authorization: `Bearer ${token}`,
                     "Content-Type": "application/json",
@@ -145,7 +146,7 @@ export function UserListDialog() {
             setLoadingAction(true);
             const token = localStorage.getItem("token");
             const response = await fetch(
-                `http://127.0.0.1:8000/users/${selectedUser}/role?role=${userRole}`,
+                getApiUrl(`/users/${selectedUser}/role?role=${userRole}`),
                 {
                     method: "PATCH",
                     headers: {
@@ -196,7 +197,7 @@ export function UserListDialog() {
             setLoadingAction(true);
             const token = localStorage.getItem("token");
             const response = await fetch(
-                `http://127.0.0.1:8000/users/${selectedUser}`,
+                getApiUrl(`/users/${selectedUser}`),
                 {
                     method: "DELETE",
                     headers: {

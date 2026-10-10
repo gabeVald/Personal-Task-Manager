@@ -11,6 +11,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { useToast } from "@/components/ui/use-toast";
 import { useRouter } from "next/router";
+import { getApiUrl } from "@/lib/api";
 
 // Login form schema (username + password only)
 const loginFormSchema = z.object({
@@ -59,7 +60,7 @@ export function LoginForm({ className, ...props }) {
             formData.append("username", values.username);
             formData.append("password", values.password);
 
-            const response = await fetch("http://localhost:8000/users/sign-in", {
+            const response = await fetch(getApiUrl("/users/sign-in"), {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/x-www-form-urlencoded",
@@ -100,7 +101,7 @@ export function LoginForm({ className, ...props }) {
     const handleSignupSubmit = async (values) => {
         setIsLoading(true);
         try {
-            const response = await fetch("http://localhost:8000/users/signup", {
+            const response = await fetch(getApiUrl("/users/signup"), {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
