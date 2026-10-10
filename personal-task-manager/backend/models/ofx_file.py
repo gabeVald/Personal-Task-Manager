@@ -31,6 +31,9 @@ class Transaction(Document):
     description: Optional[str] = None
     category: str = "Uncategorized"  # Default category
     username: str  # The user who owns this transaction
+    source_transaction_id: Optional[str] = None
+    source_category: Optional[str] = None
+    posting_status: str = "settled"
 
     class Settings:
         name = "transactions"

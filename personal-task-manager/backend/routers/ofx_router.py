@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta
+from datetime import datetime
 from typing import Annotated, Optional
 from beanie import PydanticObjectId
 from fastapi import (
@@ -11,19 +11,27 @@ from fastapi import (
     File as FastAPIFile,
     Form,
 )
-from fastapi.responses import JSONResponse
 from models.ofx_file import (
     OFXFile,
     Transaction,
-    OFXFileRequest,
     TransactionUpdate,
     CategorySummary,
-    MonthlySummary,
+)
+from models.budget_target import (
+    BudgetTarget,
+    BudgetTargetRequest,
+    is_valid_month,
 )
 from models.log import Log
 from auth.jwt_auth import TokenData
 from routers.user_router import get_user
 from ofxparse import OfxParser
+from csv_transaction_parser import (
+    CSVFormatError,
+    SPENDING_CATEGORIES,
+    is_pending_status,
+    parse_csv_transactions,
+)
 import logging
 import io
 
@@ -32,16 +40,20 @@ logger = logging.getLogger(__name__)
 
 ofx_router = APIRouter()
 
-# Define spending categories
-SPENDING_CATEGORIES = [
-    "Food, Dining & Entertainment",
-    "Auto, Commute & Travel",
-    "Shopping",
-    "Bills & Subscriptions",
-    "Family & Pets",
-    "Other Expenses",
-    "Health & Personal Care",
-]
+
+def _month_date_range(month: str) -> tuple[datetime, datetime]:
+    if not is_valid_month(month):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Invalid month format. Use YYYY-MM",
+        )
+    year, month_number = map(int, month.split("-"))
+    start_date = datetime(year, month_number, 1)
+    if month_number == 12:
+        end_date = datetime(year + 1, 1, 1)
+    else:
+        end_date = datetime(year, month_number + 1, 1)
+    return start_date, end_date
 
 
 @ofx_router.post("/upload", status_code=status.HTTP_201_CREATED)
@@ -50,112 +62,160 @@ async def upload_ofx_file(
     current_user: Annotated[TokenData, Depends(get_user)],
     description: Optional[str] = Form(None),
 ):
-    """Upload and parse an OFX file"""
-    logger.info(f"User {current_user.username} uploading OFX file: {file.filename}")
+    """Upload and parse an OFX, QFX, or CSV transaction export."""
+    filename = file.filename or ""
+    extension = filename.lower().rsplit(".", 1)[-1] if "." in filename else ""
+    logger.info(f"User {current_user.username} uploading budget file: {filename}")
 
-    # Validate file type
-    if not file.filename.lower().endswith((".ofx", ".qfx")):
+    if extension not in {"ofx", "qfx", "csv"}:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Only OFX and QFX files are supported",
+            detail="Only OFX, QFX, and CSV files are supported",
         )
 
     try:
-        # Read file content
         file_content = await file.read()
         file_size = len(file_content)
-
-        # Create OFX file record
+        now = datetime.now()
         ofx_file = OFXFile(
-            filename=f"{current_user.username}_{datetime.now().strftime('%Y%m%d_%H%M%S')}_{file.filename}",
-            original_filename=file.filename,
+            filename=f"{current_user.username}_{now.strftime('%Y%m%d_%H%M%S')}_{filename}",
+            original_filename=filename,
             file_size=file_size,
-            upload_date=datetime.now(),
+            upload_date=now,
             parsed_status="pending",
             username=current_user.username,
         )
-
-        # Save OFX file record
         await ofx_file.insert()
 
-        # Parse OFX content
-        try:
-            ofx_content = file_content.decode("utf-8")
-            parsed_data = OfxParser.parse(io.StringIO(ofx_content))
+        transaction_count = 0
+        duplicate_count = 0
+        invalid_rows = []
 
-            transaction_count = 0
+        if extension == "csv":
+            try:
+                parsed_csv = parse_csv_transactions(file_content)
+            except CSVFormatError as parse_error:
+                ofx_file.parsed_status = "error"
+                ofx_file.parse_error = str(parse_error)
+                await ofx_file.save()
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    detail=f"Failed to parse CSV file: {parse_error}",
+                ) from parse_error
 
-            # Extract transactions from parsed data
-            if hasattr(parsed_data, "account") and parsed_data.account:
-                account = parsed_data.account
-                if hasattr(account, "statement") and account.statement:
-                    statement = account.statement
-                    if hasattr(statement, "transactions") and statement.transactions:
-                        for tx in statement.transactions:
-                            # Create transaction record
-                            transaction = Transaction(
-                                ofx_file_id=ofx_file.id,
-                                transaction_date=tx.date,
-                                merchant_payee=tx.payee or "Unknown",
-                                amount=float(tx.amount),
-                                transaction_type=(
-                                    "debit" if float(tx.amount) < 0 else "credit"
-                                ),
-                                description=tx.memo or "",
-                                category="Uncategorized",
-                                username=current_user.username,
-                            )
-                            await transaction.insert()
-                            transaction_count += 1
+            duplicate_count = parsed_csv.duplicate_count
+            invalid_rows = parsed_csv.invalid_rows
+            source_ids = {
+                transaction.source_transaction_id
+                for transaction in parsed_csv.transactions
+                if transaction.source_transaction_id
+            }
+            existing_source_ids = set()
+            if source_ids:
+                existing_transactions = await Transaction.find(
+                    {
+                        "username": current_user.username,
+                        "source_transaction_id": {"$in": list(source_ids)},
+                    }
+                ).to_list()
+                existing_source_ids = {
+                    transaction.source_transaction_id
+                    for transaction in existing_transactions
+                }
 
-            # Update OFX file with success status
-            ofx_file.parsed_status = "success"
-            ofx_file.transaction_count = transaction_count
-            await ofx_file.save()
+            for parsed_transaction in parsed_csv.transactions:
+                source_id = parsed_transaction.source_transaction_id
+                if source_id and source_id in existing_source_ids:
+                    duplicate_count += 1
+                    continue
+                transaction = Transaction(
+                    ofx_file_id=ofx_file.id,
+                    transaction_date=parsed_transaction.transaction_date,
+                    merchant_payee=parsed_transaction.merchant_payee,
+                    amount=parsed_transaction.amount,
+                    transaction_type=parsed_transaction.transaction_type,
+                    description=parsed_transaction.description,
+                    category=parsed_transaction.category,
+                    source_category=parsed_transaction.source_category,
+                    source_transaction_id=source_id,
+                    posting_status=parsed_transaction.posting_status,
+                    username=current_user.username,
+                )
+                await transaction.insert()
+                transaction_count += 1
+        else:
+            try:
+                ofx_content = file_content.decode("utf-8")
+                parsed_data = OfxParser.parse(io.StringIO(ofx_content))
+                account = getattr(parsed_data, "account", None)
+                statement = getattr(account, "statement", None) if account else None
+                transactions = getattr(statement, "transactions", []) if statement else []
 
-            logger.info(
-                f"Successfully parsed {transaction_count} transactions from {file.filename}"
-            )
+                for tx in transactions or []:
+                    amount = float(tx.amount)
+                    transaction = Transaction(
+                        ofx_file_id=ofx_file.id,
+                        transaction_date=tx.date,
+                        merchant_payee=tx.payee or "Unknown",
+                        amount=amount,
+                        transaction_type="debit" if amount < 0 else "credit",
+                        description=tx.memo or "",
+                        category="Uncategorized",
+                        username=current_user.username,
+                    )
+                    await transaction.insert()
+                    transaction_count += 1
+            except Exception as parse_error:
+                logger.error(f"Error parsing OFX file {filename}: {parse_error}")
+                ofx_file.parsed_status = "error"
+                ofx_file.parse_error = str(parse_error)
+                await ofx_file.save()
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    detail=f"Failed to parse OFX file: {parse_error}",
+                ) from parse_error
 
-        except Exception as parse_error:
-            logger.error(f"Error parsing OFX file {file.filename}: {str(parse_error)}")
-            ofx_file.parsed_status = "error"
-            ofx_file.parse_error = str(parse_error)
-            await ofx_file.save()
+        ofx_file.parsed_status = "success"
+        ofx_file.transaction_count = transaction_count
+        await ofx_file.save()
 
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail=f"Failed to parse OFX file: {str(parse_error)}",
-            )
-
-        # Log the action
-        now = datetime.now()
         log_entry = Log(
             username=current_user.username,
             endpoint="upload_ofx_file",
-            time=now,
+            time=datetime.now(),
             details={
-                "filename": file.filename,
+                "filename": filename,
                 "file_size": file_size,
                 "transaction_count": transaction_count,
+                "duplicate_count": duplicate_count,
+                "invalid_row_count": len(invalid_rows),
                 "status": ofx_file.parsed_status,
             },
         )
         await Log.insert_one(log_entry)
 
-        return {
-            "message": "OFX file uploaded and parsed successfully",
+        response = {
+            "message": (
+                "CSV file uploaded and parsed successfully"
+                if extension == "csv"
+                else "OFX file uploaded and parsed successfully"
+            ),
             "file_id": str(ofx_file.id),
             "transaction_count": transaction_count,
             "status": ofx_file.parsed_status,
         }
-
-    except Exception as e:
-        logger.error(f"Error uploading OFX file: {str(e)}")
+        if extension == "csv":
+            response["duplicate_count"] = duplicate_count
+            response["invalid_rows"] = invalid_rows
+        return response
+    except HTTPException:
+        raise
+    except Exception as error:
+        logger.error(f"Error uploading budget file {filename}: {error}")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Failed to upload file: {str(e)}",
-        )
+            detail=f"Failed to upload file: {error}",
+        ) from error
 
 
 @ofx_router.get("/files", status_code=status.HTTP_200_OK)
@@ -276,6 +336,7 @@ async def get_transactions(
     category: Optional[str] = None,
     start_date: Optional[datetime] = None,
     end_date: Optional[datetime] = None,
+    month: Optional[str] = None,
     transaction_type: Optional[str] = "debit",  # Default to debit (spending)
 ):
     """Get transactions for the current user with optional filtering"""
@@ -290,7 +351,15 @@ async def get_transactions(
     if transaction_type:
         query["transaction_type"] = transaction_type
 
-    if start_date or end_date:
+    if month:
+        month_start, month_end = _month_date_range(month)
+        date_query = {"$gte": month_start, "$lt": month_end}
+        if start_date:
+            date_query["$gte"] = max(month_start, start_date)
+        if end_date:
+            date_query["$lte"] = end_date
+        query["transaction_date"] = date_query
+    elif start_date or end_date:
         date_query = {}
         if start_date:
             date_query["$gte"] = start_date
@@ -366,6 +435,62 @@ async def get_categories():
     return {"categories": SPENDING_CATEGORIES}
 
 
+@ofx_router.get("/targets", status_code=status.HTTP_200_OK)
+async def get_budget_targets(
+    current_user: Annotated[TokenData, Depends(get_user)],
+    month: str,
+):
+    """Get monthly category targets belonging to the authenticated user."""
+    _month_date_range(month)
+    target_document = await BudgetTarget.find_one(
+        {"username": current_user.username, "month": month}
+    )
+    targets = target_document.targets if target_document else []
+    return {
+        "month": month,
+        "targets": [
+            {"category": target.category, "amount": target.amount}
+            for target in targets
+        ],
+    }
+
+
+@ofx_router.put("/targets", status_code=status.HTTP_200_OK)
+async def save_budget_targets(
+    request: BudgetTargetRequest,
+    current_user: Annotated[TokenData, Depends(get_user)],
+):
+    """Replace the authenticated user's category targets for one month."""
+    categories = [target.category.casefold() for target in request.targets]
+    if len(categories) != len(set(categories)):
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail="Each category can only have one target per month",
+        )
+
+    target_document = await BudgetTarget.find_one(
+        {"username": current_user.username, "month": request.month}
+    )
+    if target_document:
+        target_document.targets = request.targets
+        await target_document.save()
+    else:
+        target_document = BudgetTarget(
+            username=current_user.username,
+            month=request.month,
+            targets=request.targets,
+        )
+        await target_document.insert()
+
+    return {
+        "month": request.month,
+        "targets": [
+            {"category": target.category, "amount": target.amount}
+            for target in request.targets
+        ],
+    }
+
+
 @ofx_router.get("/summary", status_code=status.HTTP_200_OK)
 async def get_spending_summary(
     current_user: Annotated[TokenData, Depends(get_user)],
@@ -374,44 +499,32 @@ async def get_spending_summary(
     """Get spending summary by category"""
     logger.info(f"User {current_user.username} retrieving spending summary")
 
-    # Calculate date range for the month
-    if month:
-        try:
-            # month format: YYYY-MM
-            year, month_num = map(int, month.split("-"))
-            start_date = datetime(year, month_num, 1)
-            if month_num == 12:
-                end_date = datetime(year + 1, 1, 1)
-            else:
-                end_date = datetime(year, month_num + 1, 1)
-        except ValueError:
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail="Invalid month format. Use YYYY-MM",
-            )
-    else:
-        # Default to current month
-        now = datetime.now()
-        start_date = datetime(now.year, now.month, 1)
-        if now.month == 12:
-            end_date = datetime(now.year + 1, 1, 1)
-        else:
-            end_date = datetime(now.year, now.month + 1, 1)
+    now = datetime.now()
+    effective_month = month or f"{now.year}-{now.month:02d}"
+    start_date, end_date = _month_date_range(effective_month)
 
-    # Get transactions for the month (only debits - spending)
     transactions = await Transaction.find(
         {
             "username": current_user.username,
             "transaction_date": {"$gte": start_date, "$lt": end_date},
-            "transaction_type": "debit",  # Only count debits (spending)
         }
     ).to_list()
 
-    # Calculate category summaries
     category_totals = {}
-    total_spent = 0
+    total_spent = 0.0
+    total_income = 0.0
+    pending_count = 0
 
     for tx in transactions:
+        if is_pending_status(tx.posting_status):
+            pending_count += 1
+            continue
+        if tx.transaction_type == "credit":
+            total_income += abs(tx.amount)
+            continue
+        if tx.transaction_type != "debit":
+            continue
+
         category = tx.category
         amount = abs(tx.amount)  # Convert to positive for spending
 
@@ -445,16 +558,21 @@ async def get_spending_summary(
         endpoint="get_spending_summary",
         time=now,
         details={
-            "month": month,
-            "total_spent": total_spent,
+            "month": effective_month,
+            "total_spent": round(total_spent, 2),
+            "total_income": round(total_income, 2),
+            "pending_count": pending_count,
             "category_count": len(categories),
         },
     )
     await Log.insert_one(log_entry)
 
     return {
-        "month": month or f"{now.year}-{now.month:02d}",
+        "month": effective_month,
         "total_spent": round(total_spent, 2),
+        "total_income": round(total_income, 2),
+        "net_cash_flow": round(total_income - total_spent, 2),
+        "pending_count": pending_count,
         "categories": categories,
     }
 
@@ -468,92 +586,106 @@ async def get_multi_month_summary(
     """Get spending summary across multiple months"""
     logger.info(f"User {current_user.username} retrieving multi-month spending summary")
 
-    try:
-        # Parse start and end months
-        start_year, start_month_num = map(int, start_month.split("-"))
-        end_year, end_month_num = map(int, end_month.split("-"))
-
-        # Calculate date range
-        start_date = datetime(start_year, start_month_num, 1)
-        if end_month_num == 12:
-            end_date = datetime(end_year + 1, 1, 1)
-        else:
-            end_date = datetime(end_year, end_month_num + 1, 1)
-
-        # Get transactions for the date range (only debits - spending)
-        transactions = await Transaction.find(
-            {
-                "username": current_user.username,
-                "transaction_date": {"$gte": start_date, "$lt": end_date},
-                "transaction_type": "debit",  # Only count debits (spending)
-            }
-        ).to_list()
-
-        # Calculate category summaries
-        category_totals = {}
-        total_spent = 0
-        monthly_totals = {}
-
-        for tx in transactions:
-            category = tx.category
-            amount = abs(tx.amount)  # Convert to positive for spending
-            month_key = tx.transaction_date.strftime("%Y-%m")
-
-            # Category totals
-            if category not in category_totals:
-                category_totals[category] = {"amount": 0, "count": 0}
-            category_totals[category]["amount"] += amount
-            category_totals[category]["count"] += 1
-            total_spent += amount
-
-            # Monthly totals
-            if month_key not in monthly_totals:
-                monthly_totals[month_key] = {"amount": 0, "count": 0}
-            monthly_totals[month_key]["amount"] += amount
-            monthly_totals[month_key]["count"] += 1
-
-        # Create category summaries
-        categories = []
-        for category, data in category_totals.items():
-            percentage = (data["amount"] / total_spent * 100) if total_spent > 0 else 0
-            categories.append(
-                CategorySummary(
-                    category=category,
-                    total_amount=data["amount"],
-                    transaction_count=data["count"],
-                    percentage=round(percentage, 2),
-                )
-            )
-
-        # Sort by amount descending
-        categories.sort(key=lambda x: x.total_amount, reverse=True)
-
-        # Log the action
-        now = datetime.now()
-        log_entry = Log(
-            username=current_user.username,
-            endpoint="get_multi_month_summary",
-            time=now,
-            details={
-                "start_month": start_month,
-                "end_month": end_month,
-                "total_spent": total_spent,
-                "category_count": len(categories),
-                "month_count": len(monthly_totals),
-            },
+    start_date, _ = _month_date_range(start_month)
+    end_month_start, end_date = _month_date_range(end_month)
+    if start_date > end_month_start:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="start_month must be on or before end_month",
         )
-        await Log.insert_one(log_entry)
 
-        return {
+    transactions = await Transaction.find(
+        {
+            "username": current_user.username,
+            "transaction_date": {"$gte": start_date, "$lt": end_date},
+        }
+    ).to_list()
+
+    category_totals = {}
+    monthly_totals = {}
+    monthly_categories = {}
+    cursor = start_date
+    while cursor <= end_month_start:
+        month_key = cursor.strftime("%Y-%m")
+        monthly_totals[month_key] = {"amount": 0.0, "count": 0}
+        monthly_categories[month_key] = {}
+        if cursor.month == 12:
+            cursor = datetime(cursor.year + 1, 1, 1)
+        else:
+            cursor = datetime(cursor.year, cursor.month + 1, 1)
+
+    total_spent = 0.0
+    total_income = 0.0
+    pending_count = 0
+    for tx in transactions:
+        if is_pending_status(tx.posting_status):
+            pending_count += 1
+            continue
+        if tx.transaction_type == "credit":
+            total_income += abs(tx.amount)
+            continue
+        if tx.transaction_type != "debit":
+            continue
+
+        category = tx.category
+        amount = abs(tx.amount)
+        month_key = tx.transaction_date.strftime("%Y-%m")
+
+        if category not in category_totals:
+            category_totals[category] = {"amount": 0.0, "count": 0}
+        category_totals[category]["amount"] += amount
+        category_totals[category]["count"] += 1
+        total_spent += amount
+
+        monthly_totals[month_key]["amount"] += amount
+        monthly_totals[month_key]["count"] += 1
+        monthly_categories[month_key][category] = (
+            monthly_categories[month_key].get(category, 0.0) + amount
+        )
+
+    categories = []
+    for category, data in category_totals.items():
+        percentage = (data["amount"] / total_spent * 100) if total_spent > 0 else 0
+        categories.append(
+            CategorySummary(
+                category=category,
+                total_amount=round(data["amount"], 2),
+                transaction_count=data["count"],
+                percentage=round(percentage, 2),
+            )
+        )
+    categories.sort(key=lambda item: item.total_amount, reverse=True)
+
+    for totals in monthly_totals.values():
+        totals["amount"] = round(totals["amount"], 2)
+    for category_totals_by_month in monthly_categories.values():
+        for category, amount in category_totals_by_month.items():
+            category_totals_by_month[category] = round(amount, 2)
+
+    log_entry = Log(
+        username=current_user.username,
+        endpoint="get_multi_month_summary",
+        time=datetime.now(),
+        details={
             "start_month": start_month,
             "end_month": end_month,
             "total_spent": round(total_spent, 2),
-            "categories": categories,
-            "monthly_totals": monthly_totals,
-        }
+            "total_income": round(total_income, 2),
+            "pending_count": pending_count,
+            "category_count": len(categories),
+            "month_count": len(monthly_totals),
+        },
+    )
+    await Log.insert_one(log_entry)
 
-    except ValueError:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Invalid month format. Use YYYY-MM",
-        )
+    return {
+        "start_month": start_month,
+        "end_month": end_month,
+        "total_spent": round(total_spent, 2),
+        "total_income": round(total_income, 2),
+        "net_cash_flow": round(total_income - total_spent, 2),
+        "pending_count": pending_count,
+        "categories": categories,
+        "monthly_totals": monthly_totals,
+        "monthly_categories": monthly_categories,
+    }

@@ -6,55 +6,54 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Separator } from "@/components/ui/separator";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Upload, FileText, DollarSign, TrendingUp, AlertCircle, Calendar } from "lucide-react";
+import { AlertCircle, ChevronLeft, ChevronRight, FileText, Upload } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
-import { SpendingDonutChart } from "@/components/SpendingDonutChart";
-import { TopSpendingCategories } from "@/components/TopSpendingCategories";
+import CsvImportDialog from "@/components/budget/CsvImportDialog";
+import { BklitCategoryChart } from "@/components/financial-dashboard/BklitCategoryChart";
+import { BklitMonthlyTrendChart } from "@/components/financial-dashboard/BklitMonthlyTrendChart";
+import { BudgetTargetsEditor } from "@/components/financial-dashboard/BudgetTargetsEditor";
+import { FinancialStatusCards } from "@/components/financial-dashboard/FinancialStatusCards";
 
 // Spending categories
 const SPENDING_CATEGORIES = ["Food, Dining & Entertainment", "Auto, Commute & Travel", "Shopping", "Bills & Subscriptions", "Family & Pets", "Other Expenses", "Health & Personal Care"];
+const TRANSACTIONS_PAGE_SIZE = 50;
 
-// Chart configuration for spending categories
-const chartConfig = {
-    "Food, Dining & Entertainment": {
-        label: "Food & Dining",
-        color: "hsl(var(--chart-1))",
-    },
-    "Auto, Commute & Travel": {
-        label: "Auto & Travel",
-        color: "hsl(var(--chart-2))",
-    },
-    Shopping: {
-        label: "Shopping",
-        color: "hsl(var(--chart-3))",
-    },
-    "Bills & Subscriptions": {
-        label: "Bills",
-        color: "hsl(var(--chart-4))",
-    },
-    "Family & Pets": {
-        label: "Family & Pets",
-        color: "hsl(var(--chart-5))",
-    },
-    "Other Expenses": {
-        label: "Other",
-        color: "hsl(var(--chart-6))",
-    },
-    "Health & Personal Care": {
-        label: "Health & Care",
-        color: "hsl(var(--chart-7))",
-    },
-    Uncategorized: {
-        label: "Uncategorized",
-        color: "hsl(var(--muted))",
-    },
-};
+const CHART_COLORS = [
+    "var(--chart-1)",
+    "var(--chart-2)",
+    "var(--chart-3)",
+    "var(--chart-4)",
+    "var(--chart-5)",
+    "color-mix(in srgb, var(--chart-1) 68%, var(--background))",
+    "color-mix(in srgb, var(--chart-2) 68%, var(--background))",
+    "var(--muted-foreground)",
+];
+const CHART_CATEGORIES = [...SPENDING_CATEGORIES, "Uncategorized"].map((key, index) => ({
+    key,
+    label: key,
+    color: CHART_COLORS[index],
+}));
+
+function getCurrentMonthKey() {
+    const now = new Date();
+    return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
+}
+
+function shiftMonthKey(monthKey, offset) {
+    const [year, month] = monthKey.split("-").map(Number);
+    const date = new Date(year, month - 1 + offset, 1);
+    return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}`;
+}
+
+function formatMonthLabel(monthKey) {
+    const [year, month] = monthKey.split("-").map(Number);
+    return new Date(year, month - 1, 1).toLocaleDateString("en-US", { month: "short", year: "2-digit" });
+}
 
 export default function BudgetPage() {
     const router = useRouter();
@@ -62,16 +61,24 @@ export default function BudgetPage() {
 
     // State management
     const [isLoading, setIsLoading] = useState(false);
+    const [isCsvImporting, setIsCsvImporting] = useState(false);
+    const [isDashboardLoading, setIsDashboardLoading] = useState(true);
+    const [isTrendLoading, setIsTrendLoading] = useState(true);
+    const [isTargetsSaving, setIsTargetsSaving] = useState(false);
     const [ofxFiles, setOfxFiles] = useState([]);
     const [transactions, setTransactions] = useState([]);
+    const [transactionPage, setTransactionPage] = useState(0);
+    const [hasMoreTransactions, setHasMoreTransactions] = useState(false);
     const [spendingSummary, setSpendingSummary] = useState(null);
+    const [multiMonthSummary, setMultiMonthSummary] = useState(null);
+    const [budgetTargets, setBudgetTargets] = useState([]);
     const [selectedCategory, setSelectedCategory] = useState("");
-    const [selectedMonth, setSelectedMonth] = useState("");
-    const [monthlyIncome, setMonthlyIncome] = useState("");
+    const [selectedMonth, setSelectedMonth] = useState(getCurrentMonthKey);
     const [uploadDialogOpen, setUploadDialogOpen] = useState(false);
-    const [viewMode, setViewMode] = useState("single"); // "single" or "multi"
-    const [startMonth, setStartMonth] = useState("");
-    const [endMonth, setEndMonth] = useState("");
+    const [csvImportOpen, setCsvImportOpen] = useState(false);
+    const [activeTab, setActiveTab] = useState("overview");
+    const [startMonth, setStartMonth] = useState(() => shiftMonthKey(getCurrentMonthKey(), -11));
+    const [endMonth, setEndMonth] = useState(getCurrentMonthKey);
 
     // Check authentication
     useEffect(() => {
@@ -82,119 +89,117 @@ export default function BudgetPage() {
         }
     }, [router]);
 
-    // Fetch OFX files
+    const authHeaders = () => ({
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+    });
+
+    // Fetch imported statements and CSV files.
     const fetchOFXFiles = async () => {
         try {
-            const response = await fetch("http://127.0.0.1:8000/budget/files", {
-                headers: {
-                    Authorization: `Bearer ${localStorage.getItem("token")}`,
-                },
-            });
-
-            if (!response.ok) {
-                throw new Error("Failed to fetch OFX files");
-            }
-
-            const files = await response.json();
-            setOfxFiles(files);
+            const response = await fetch("http://127.0.0.1:8000/budget/files", { headers: authHeaders() });
+            if (!response.ok) throw new Error("Failed to fetch imported files");
+            setOfxFiles(await response.json());
         } catch (error) {
-            console.error("Error fetching OFX files:", error);
-            toast({
-                title: "Error",
-                description: "Failed to load OFX files",
-                variant: "destructive",
-            });
+            console.error("Error fetching imported files:", error);
+            toast({ title: "Error", description: "Failed to load imported files", variant: "destructive" });
         }
     };
 
-    // Fetch transactions
-    const fetchTransactions = async (category = "", month = "") => {
+    const fetchTransactions = async (category = "", month = selectedMonth, page = transactionPage) => {
         try {
-            let url = "http://127.0.0.1:8000/budget/transactions?";
             const params = new URLSearchParams();
-
             if (category) params.append("category", category);
             if (month) params.append("month", month);
-            params.append("transaction_type", "debit"); // Only show spending (debits)
+            params.append("transaction_type", "debit");
+            params.append("skip", String(page * TRANSACTIONS_PAGE_SIZE));
+            params.append("limit", String(TRANSACTIONS_PAGE_SIZE + 1));
 
-            url += params.toString();
-
-            const response = await fetch(url, {
-                headers: {
-                    Authorization: `Bearer ${localStorage.getItem("token")}`,
-                },
-            });
-
-            if (!response.ok) {
-                throw new Error("Failed to fetch transactions");
-            }
-
-            const data = await response.json();
-            setTransactions(data);
+            const response = await fetch(`http://127.0.0.1:8000/budget/transactions?${params}`, { headers: authHeaders() });
+            if (!response.ok) throw new Error("Failed to fetch transactions");
+            const results = await response.json();
+            setTransactions(results.slice(0, TRANSACTIONS_PAGE_SIZE));
+            setHasMoreTransactions(results.length > TRANSACTIONS_PAGE_SIZE);
         } catch (error) {
             console.error("Error fetching transactions:", error);
-            toast({
-                title: "Error",
-                description: "Failed to load transactions",
-                variant: "destructive",
-            });
+            toast({ title: "Error", description: "Failed to load transactions", variant: "destructive" });
         }
     };
 
-    // Fetch spending summary
-    const fetchSpendingSummary = async (month = "") => {
+    const fetchSpendingSummary = async (month = selectedMonth) => {
+        setIsDashboardLoading(true);
         try {
-            let url = "http://127.0.0.1:8000/budget/summary";
-            if (month) url += `?month=${month}`;
-
-            const response = await fetch(url, {
-                headers: {
-                    Authorization: `Bearer ${localStorage.getItem("token")}`,
-                },
-            });
-
-            if (!response.ok) {
-                throw new Error("Failed to fetch spending summary");
-            }
-
-            const summary = await response.json();
-            setSpendingSummary(summary);
+            const params = new URLSearchParams({ month });
+            const response = await fetch(`http://127.0.0.1:8000/budget/summary?${params}`, { headers: authHeaders() });
+            if (!response.ok) throw new Error("Failed to fetch spending summary");
+            setSpendingSummary(await response.json());
         } catch (error) {
             console.error("Error fetching spending summary:", error);
-            toast({
-                title: "Error",
-                description: "Failed to load spending summary",
-                variant: "destructive",
-            });
+            toast({ title: "Error", description: "Failed to load financial status", variant: "destructive" });
+        } finally {
+            setIsDashboardLoading(false);
         }
     };
 
-    // Fetch multi-month spending summary
-    const fetchMultiMonthSummary = async (startMonth, endMonth) => {
+    const fetchBudgetTargets = async (month = selectedMonth) => {
         try {
-            const params = new URLSearchParams();
-            params.append("start_month", startMonth);
-            params.append("end_month", endMonth);
+            const params = new URLSearchParams({ month });
+            const response = await fetch(`http://127.0.0.1:8000/budget/targets?${params}`, { headers: authHeaders() });
+            if (!response.ok) throw new Error("Failed to fetch budget targets");
+            const result = await response.json();
+            setBudgetTargets(Array.isArray(result.targets) ? result.targets : []);
+        } catch (error) {
+            console.error("Error fetching budget targets:", error);
+            toast({ title: "Error", description: "Failed to load budget targets", variant: "destructive" });
+        }
+    };
 
-            const response = await fetch(`http://127.0.0.1:8000/budget/summary/multi-month?${params}`, {
-                headers: {
-                    Authorization: `Bearer ${localStorage.getItem("token")}`,
-                },
-            });
-
-            if (!response.ok) {
-                throw new Error("Failed to fetch multi-month summary");
-            }
-
-            const data = await response.json();
-            setSpendingSummary(data);
+    const fetchMultiMonthSummary = async (start = startMonth, end = endMonth) => {
+        if (!start || !end || start > end) return;
+        setIsTrendLoading(true);
+        try {
+            const params = new URLSearchParams({ start_month: start, end_month: end });
+            const response = await fetch(`http://127.0.0.1:8000/budget/summary/multi-month?${params}`, { headers: authHeaders() });
+            if (!response.ok) throw new Error("Failed to fetch trend summary");
+            setMultiMonthSummary(await response.json());
         } catch (error) {
             console.error("Error fetching multi-month summary:", error);
-            toast({
-                title: "Error",
-                description: "Failed to load multi-month summary",
-                variant: "destructive",
+            toast({ title: "Error", description: "Failed to load monthly spending trends", variant: "destructive" });
+        } finally {
+            setIsTrendLoading(false);
+        }
+    };
+
+    const refreshBudgetData = async (month = selectedMonth) => {
+        await Promise.all([
+            fetchOFXFiles(),
+            fetchSpendingSummary(month),
+            fetchBudgetTargets(month),
+            fetchTransactions(selectedCategory, month),
+            fetchMultiMonthSummary(startMonth, endMonth),
+        ]);
+    };
+
+    const saveBudgetTargets = async (targets) => {
+        setIsTargetsSaving(true);
+        try {
+            const response = await fetch("http://127.0.0.1:8000/budget/targets", {
+                method: "PUT",
+                headers: { ...authHeaders(), "Content-Type": "application/json" },
+                body: JSON.stringify({ month: selectedMonth, targets }),
             });
+            if (!response.ok) {
+                const errorData = await response.json().catch(() => ({}));
+                throw new Error(errorData.detail || "Failed to save budget targets");
+            }
+
+            const result = await response.json();
+            setBudgetTargets(result.targets || []);
+            toast({ title: "Targets saved", description: "Your monthly budget targets have been updated." });
+        } catch (error) {
+            toast({ title: "Could not save targets", description: error.message, variant: "destructive" });
+            throw error;
+        } finally {
+            setIsTargetsSaving(false);
         }
     };
 
@@ -236,10 +241,7 @@ export default function BudgetPage() {
                 description: `File uploaded successfully. ${result.transaction_count} transactions parsed.`,
             });
 
-            // Refresh data
-            await fetchOFXFiles();
-            await fetchSpendingSummary(selectedMonth);
-            await fetchTransactions(selectedCategory, selectedMonth);
+            await refreshBudgetData(selectedMonth);
 
             setUploadDialogOpen(false);
         } catch (error) {
@@ -251,6 +253,34 @@ export default function BudgetPage() {
             });
         } finally {
             setIsLoading(false);
+        }
+    };
+
+    const handleCsvImport = async (file) => {
+        setIsCsvImporting(true);
+        try {
+            const formData = new FormData();
+            formData.append("file", file);
+
+            const response = await fetch("http://127.0.0.1:8000/budget/upload", {
+                method: "POST",
+                headers: authHeaders(),
+                body: formData,
+            });
+
+            const result = await response.json().catch(() => ({}));
+            if (!response.ok) {
+                throw new Error(result.detail || "Failed to import CSV");
+            }
+
+            await refreshBudgetData(selectedMonth);
+            toast({
+                title: "CSV imported",
+                description: `${result.transaction_count || 0} transactions added${result.duplicate_count ? `; ${result.duplicate_count} duplicates skipped` : ""}.`,
+            });
+            return result;
+        } finally {
+            setIsCsvImporting(false);
         }
     };
 
@@ -275,9 +305,11 @@ export default function BudgetPage() {
                 description: "Transaction category updated",
             });
 
-            // Refresh data
-            await fetchSpendingSummary(selectedMonth);
-            await fetchTransactions(selectedCategory, selectedMonth);
+            await Promise.all([
+                fetchSpendingSummary(selectedMonth),
+                fetchTransactions(selectedCategory, selectedMonth),
+                fetchMultiMonthSummary(startMonth, endMonth),
+            ]);
         } catch (error) {
             console.error("Error updating category:", error);
             toast({
@@ -311,10 +343,7 @@ export default function BudgetPage() {
                 description: "File and transactions deleted",
             });
 
-            // Refresh data
-            await fetchOFXFiles();
-            await fetchSpendingSummary(selectedMonth);
-            await fetchTransactions(selectedCategory, selectedMonth);
+            await refreshBudgetData(selectedMonth);
         } catch (error) {
             console.error("Error deleting file:", error);
             toast({
@@ -325,12 +354,14 @@ export default function BudgetPage() {
         }
     };
 
-    // Load data on component mount
+    // Load current-period status, budget targets, transaction details, and the default 12-month trend.
     useEffect(() => {
         fetchOFXFiles();
-        fetchSpendingSummary();
-        fetchTransactions();
-    }, []);
+        fetchSpendingSummary(selectedMonth);
+        fetchBudgetTargets(selectedMonth);
+        fetchTransactions("", selectedMonth);
+        fetchMultiMonthSummary(startMonth, endMonth);
+    }, []); // eslint-disable-line react-hooks/exhaustive-deps -- fetch functions are invoked once on mount; filters and mutations refresh explicitly.
 
     // Generate month options (last 12 months)
     const generateMonthOptions = () => {
@@ -349,231 +380,201 @@ export default function BudgetPage() {
 
     return (
         <div className="container mx-auto p-6 space-y-6">
-            <div className="flex items-center justify-between">
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                 <div>
-                    <h1 className="text-3xl font-bold">Budget & Expenses</h1>
-                    <p className="text-muted-foreground">Track your spending with OFX file uploads</p>
+                    <p className="text-sm font-medium uppercase tracking-[0.18em] text-muted-foreground">Financial overview</p>
+                    <h1 className="mt-1 text-3xl font-bold tracking-tight">Budget & Spending</h1>
+                    <p className="mt-1 text-muted-foreground">Understand cash flow, spending trends, and category budgets.</p>
                 </div>
-                <Dialog open={uploadDialogOpen} onOpenChange={setUploadDialogOpen}>
-                    <DialogTrigger asChild>
-                        <Button>
-                            <Upload className="h-4 w-4 mr-2" />
-                            Upload OFX File
-                        </Button>
-                    </DialogTrigger>
-                    <DialogContent>
-                        <DialogHeader>
-                            <DialogTitle>Upload OFX File</DialogTitle>
-                        </DialogHeader>
-                        <div className="space-y-4">
-                            <div>
-                                <Label htmlFor="file">Select OFX/QFX File</Label>
-                                <Input id="file" type="file" accept=".ofx,.qfx" onChange={handleFileUpload} disabled={isLoading} />
+                <div className="flex flex-wrap items-center gap-2">
+                    <Button variant="outline" onClick={() => router.push("/visualization-demos")}>
+                        Compare chart demos
+                    </Button>
+                    <Button variant="outline" onClick={() => setCsvImportOpen(true)}>
+                        <Upload className="mr-2 h-4 w-4" />
+                        Import CSV
+                    </Button>
+                    <Dialog open={uploadDialogOpen} onOpenChange={setUploadDialogOpen}>
+                        <DialogTrigger asChild>
+                            <Button>
+                                <Upload className="h-4 w-4 mr-2" />
+                                Upload OFX/QFX
+                            </Button>
+                        </DialogTrigger>
+                        <DialogContent>
+                            <DialogHeader>
+                                <DialogTitle>Upload OFX or QFX file</DialogTitle>
+                            </DialogHeader>
+                            <div className="space-y-4">
+                                <div>
+                                    <Label htmlFor="file">Select OFX/QFX file</Label>
+                                    <Input id="file" type="file" accept=".ofx,.qfx" onChange={handleFileUpload} disabled={isLoading} />
+                                </div>
+                                <Alert>
+                                    <AlertCircle className="h-4 w-4" />
+                                    <AlertDescription>Import a bank statement. Transactions will be added to your dashboard and can be categorized later.</AlertDescription>
+                                </Alert>
                             </div>
-                            <Alert>
-                                <AlertCircle className="h-4 w-4" />
-                                <AlertDescription>Upload your bank's OFX or QFX file to automatically parse transactions.</AlertDescription>
-                            </Alert>
-                        </div>
-                    </DialogContent>
-                </Dialog>
+                        </DialogContent>
+                    </Dialog>
+                </div>
             </div>
 
-            <Tabs defaultValue="overview" className="space-y-4">
+            <CsvImportDialog
+                isImporting={isCsvImporting}
+                onImport={handleCsvImport}
+                onOpenChange={setCsvImportOpen}
+                open={csvImportOpen}
+            />
+
+            <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
                 <TabsList>
                     <TabsTrigger value="overview">Overview</TabsTrigger>
                     <TabsTrigger value="transactions">Transactions</TabsTrigger>
                     <TabsTrigger value="files">Files</TabsTrigger>
                 </TabsList>
 
-                <TabsContent value="overview" className="space-y-4">
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                        <Card>
-                            <CardHeader>
-                                <CardTitle className="flex items-center gap-2">
-                                    <Calendar className="h-5 w-5" />
-                                    Monthly Summary
-                                </CardTitle>
-                            </CardHeader>
-                            <CardContent className="space-y-4">
-                                <div className="flex items-center gap-2">
-                                    <Label htmlFor="viewMode">View:</Label>
-                                    <Select
-                                        value={viewMode}
-                                        onValueChange={(value) => {
-                                            setViewMode(value);
-                                            if (value === "single") {
-                                                fetchSpendingSummary(selectedMonth);
-                                            } else {
-                                                if (startMonth && endMonth) {
-                                                    fetchMultiMonthSummary(startMonth, endMonth);
-                                                }
-                                            }
-                                        }}
-                                    >
-                                        <SelectTrigger className="w-32">
-                                            <SelectValue placeholder="View mode" />
-                                        </SelectTrigger>
-                                        <SelectContent>
-                                            <SelectItem value="single">Single Month</SelectItem>
-                                            <SelectItem value="multi">Multi Month</SelectItem>
-                                        </SelectContent>
-                                    </Select>
-                                </div>
+                <TabsContent value="overview" className="space-y-6">
+                    <section className="flex flex-col gap-3 rounded-xl border bg-card p-4 sm:flex-row sm:items-center sm:justify-between" aria-label="Dashboard period">
+                        <div>
+                            <h2 className="font-semibold">Monthly status</h2>
+                            <p className="text-sm text-muted-foreground">Choose a month to inspect cash flow and budget progress.</p>
+                            {Number(spendingSummary?.pending_count) > 0 ? (
+                                <p className="mt-1 text-xs text-muted-foreground">
+                                    {spendingSummary.pending_count} pending transaction{spendingSummary.pending_count === 1 ? "" : "s"} excluded from settled totals.
+                                </p>
+                            ) : null}
+                        </div>
+                        <div className="flex items-center gap-3">
+                            <Label htmlFor="dashboard-month" className="shrink-0">Month</Label>
+                            <Select
+                                value={selectedMonth}
+                                 onValueChange={(value) => {
+                                    setSelectedMonth(value);
+                                    setSelectedCategory("");
+                                    setTransactionPage(0);
+                                    fetchSpendingSummary(value);
+                                    fetchBudgetTargets(value);
+                                    fetchTransactions("", value, 0);
+                                }}
+                            >
+                                <SelectTrigger id="dashboard-month" className="w-48">
+                                    <SelectValue placeholder="Select month" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    {monthOptions.map((month) => (
+                                        <SelectItem key={month.value} value={month.value}>{month.label}</SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
+                        </div>
+                    </section>
 
-                                {viewMode === "single" ? (
-                                    <div className="flex items-center gap-2">
-                                        <Label htmlFor="month">Month:</Label>
-                                        <Select
-                                            value={selectedMonth}
-                                            onValueChange={(value) => {
-                                                setSelectedMonth(value);
-                                                fetchSpendingSummary(value);
-                                                fetchTransactions(selectedCategory, value);
-                                            }}
-                                        >
-                                            <SelectTrigger className="w-48">
-                                                <SelectValue placeholder="Select month" />
-                                            </SelectTrigger>
-                                            <SelectContent>
-                                                {monthOptions.map((month) => (
-                                                    <SelectItem key={month.value} value={month.value}>
-                                                        {month.label}
-                                                    </SelectItem>
-                                                ))}
-                                            </SelectContent>
-                                        </Select>
-                                    </div>
-                                ) : (
-                                    <div className="space-y-2">
-                                        <div className="flex items-center gap-2">
-                                            <Label htmlFor="startMonth">Start Month:</Label>
-                                            <Select
-                                                value={startMonth}
-                                                onValueChange={(value) => {
-                                                    setStartMonth(value);
-                                                    if (endMonth) {
-                                                        fetchMultiMonthSummary(value, endMonth);
-                                                    }
-                                                }}
-                                            >
-                                                <SelectTrigger className="w-48">
-                                                    <SelectValue placeholder="Start month" />
-                                                </SelectTrigger>
-                                                <SelectContent>
-                                                    {monthOptions.map((month) => (
-                                                        <SelectItem key={month.value} value={month.value}>
-                                                            {month.label}
-                                                        </SelectItem>
-                                                    ))}
-                                                </SelectContent>
-                                            </Select>
-                                        </div>
-                                        <div className="flex items-center gap-2">
-                                            <Label htmlFor="endMonth">End Month:</Label>
-                                            <Select
-                                                value={endMonth}
-                                                onValueChange={(value) => {
-                                                    setEndMonth(value);
-                                                    if (startMonth) {
-                                                        fetchMultiMonthSummary(startMonth, value);
-                                                    }
-                                                }}
-                                            >
-                                                <SelectTrigger className="w-48">
-                                                    <SelectValue placeholder="End month" />
-                                                </SelectTrigger>
-                                                <SelectContent>
-                                                    {monthOptions.map((month) => (
-                                                        <SelectItem key={month.value} value={month.value}>
-                                                            {month.label}
-                                                        </SelectItem>
-                                                    ))}
-                                                </SelectContent>
-                                            </Select>
-                                        </div>
-                                    </div>
-                                )}
+                    <FinancialStatusCards
+                        isLoading={isDashboardLoading}
+                        periodLabel={monthOptions.find((month) => month.value === selectedMonth)?.label || selectedMonth}
+                        summary={spendingSummary}
+                        targets={budgetTargets}
+                    />
 
-                                {spendingSummary && (
-                                    <div className="space-y-2">
-                                        <div className="flex justify-between">
-                                            <span className="font-medium">Total Spent:</span>
-                                            <span className="text-red-600">${spendingSummary.total_spent.toFixed(2)}</span>
-                                        </div>
-                                        {viewMode === "multi" && spendingSummary.monthly_totals && (
-                                            <div className="space-y-1">
-                                                <span className="font-medium text-sm">Monthly Breakdown:</span>
-                                                {Object.entries(spendingSummary.monthly_totals)
-                                                    .sort(([a], [b]) => b.localeCompare(a))
-                                                    .map(([month, data]) => (
-                                                        <div key={month} className="flex justify-between text-sm">
-                                                            <span className="text-muted-foreground">{new Date(month + "-01").toLocaleDateString("en-US", { month: "short", year: "numeric" })}</span>
-                                                            <span className="text-red-600">${data.amount.toFixed(2)}</span>
-                                                        </div>
-                                                    ))}
-                                            </div>
-                                        )}
-                                        <div className="flex justify-between">
-                                            <span className="font-medium">{viewMode === "multi" ? "Total Income:" : "Monthly Income:"}</span>
-                                            <Input type="number" placeholder="Enter income" value={monthlyIncome} onChange={(e) => setMonthlyIncome(e.target.value)} className="w-32" />
-                                        </div>
-                                        {monthlyIncome && (
-                                            <div className="flex justify-between">
-                                                <span className="font-medium">Remaining:</span>
-                                                <span className={parseFloat(monthlyIncome) - spendingSummary.total_spent >= 0 ? "text-green-600" : "text-red-600"}>
-                                                    ${(parseFloat(monthlyIncome) - spendingSummary.total_spent).toFixed(2)}
-                                                </span>
-                                            </div>
-                                        )}
-                                    </div>
-                                )}
-                            </CardContent>
-                        </Card>
+                    <Card>
+                        <CardHeader>
+                            <CardTitle>Choose a trend range</CardTitle>
+                            <CardDescription>Compare monthly spending composition using settled transactions and their posting dates.</CardDescription>
+                        </CardHeader>
+                        <CardContent className="flex flex-col gap-4 sm:flex-row sm:items-end">
+                            <div className="grid flex-1 gap-2">
+                                <Label htmlFor="trend-start">From</Label>
+                                <Select value={startMonth} onValueChange={setStartMonth}>
+                                    <SelectTrigger id="trend-start"><SelectValue placeholder="Start month" /></SelectTrigger>
+                                    <SelectContent>
+                                        {monthOptions.map((month) => <SelectItem key={month.value} value={month.value}>{month.label}</SelectItem>)}
+                                    </SelectContent>
+                                </Select>
+                            </div>
+                            <div className="grid flex-1 gap-2">
+                                <Label htmlFor="trend-end">Through</Label>
+                                <Select value={endMonth} onValueChange={setEndMonth}>
+                                    <SelectTrigger id="trend-end"><SelectValue placeholder="End month" /></SelectTrigger>
+                                    <SelectContent>
+                                        {monthOptions.map((month) => <SelectItem key={month.value} value={month.value}>{month.label}</SelectItem>)}
+                                    </SelectContent>
+                                </Select>
+                            </div>
+                            <Button
+                                className="sm:min-w-36"
+                                onClick={() => {
+                                    if (startMonth > endMonth) {
+                                        toast({ title: "Invalid range", description: "The start month must be before the end month.", variant: "destructive" });
+                                        return;
+                                    }
+                                    fetchMultiMonthSummary(startMonth, endMonth);
+                                }}
+                                type="button"
+                            >
+                                Update trend
+                            </Button>
+                        </CardContent>
+                    </Card>
 
-                        <SpendingDonutChart
-                            spendingData={spendingSummary}
+                    <BklitMonthlyTrendChart
+                        categories={CHART_CATEGORIES}
+                        data={Object.entries(multiMonthSummary?.monthly_totals || {})
+                            .sort(([left], [right]) => left.localeCompare(right))
+                            .map(([month, totals]) => ({
+                                month,
+                                label: formatMonthLabel(month),
+                                total_spent: Number(totals.amount) || 0,
+                                categories: multiMonthSummary?.monthly_categories?.[month] || {},
+                            }))}
+                        description={`${formatMonthLabel(startMonth)} – ${formatMonthLabel(endMonth)} · stacked by spending category`}
+                        isLoading={isTrendLoading}
+                    />
+
+                    <div className="grid gap-6 xl:grid-cols-2">
+                        <BklitCategoryChart
+                            categories={spendingSummary?.categories || []}
+                            isLoading={isDashboardLoading}
+                            targets={budgetTargets}
                             onCategoryClick={(category) => {
                                 setSelectedCategory(category);
-                                fetchTransactions(category, selectedMonth);
-                                // Switch to transactions tab
-                                const transactionsTab = document.querySelector('[value="transactions"]');
-                                if (transactionsTab) transactionsTab.click();
+                                setTransactionPage(0);
+                                fetchTransactions(category, selectedMonth, 0);
+                                setActiveTab("transactions");
                             }}
                         />
+                        <BudgetTargetsEditor
+                            categories={[...SPENDING_CATEGORIES, "Uncategorized"]}
+                            isSaving={isTargetsSaving}
+                            onSave={saveBudgetTargets}
+                            targets={budgetTargets}
+                            title={`${monthOptions.find((month) => month.value === selectedMonth)?.label || selectedMonth} budget targets`}
+                        />
                     </div>
-
-                    <TopSpendingCategories
-                        spendingData={spendingSummary}
-                        selectedMonth={selectedMonth}
-                        onCategoryClick={(category) => {
-                            setSelectedCategory(category);
-                            fetchTransactions(category, selectedMonth);
-                            const transactionsTab = document.querySelector('[value="transactions"]');
-                            if (transactionsTab) transactionsTab.click();
-                        }}
-                    />
                 </TabsContent>
 
                 <TabsContent value="transactions" className="space-y-4">
                     <div className="flex items-center gap-4">
                         <Select
-                            value={selectedCategory}
+                            value={selectedCategory || "all"}
                             onValueChange={(value) => {
-                                setSelectedCategory(value);
-                                fetchTransactions(value, selectedMonth);
+                                const category = value === "all" ? "" : value;
+                                setSelectedCategory(category);
+                                setTransactionPage(0);
+                                fetchTransactions(category, selectedMonth, 0);
                             }}
                         >
                             <SelectTrigger className="w-64">
                                 <SelectValue placeholder="Filter by category" />
                             </SelectTrigger>
                             <SelectContent>
-                                <SelectItem value="">All Categories</SelectItem>
+                                <SelectItem value="all">All Categories</SelectItem>
                                 {SPENDING_CATEGORIES.map((category) => (
                                     <SelectItem key={category} value={category}>
                                         {category}
                                     </SelectItem>
                                 ))}
+                                <SelectItem value="Uncategorized">Uncategorized</SelectItem>
                             </SelectContent>
                         </Select>
                     </div>
@@ -581,7 +582,11 @@ export default function BudgetPage() {
                     <Card>
                         <CardHeader>
                             <CardTitle>Transactions</CardTitle>
-                            <CardDescription>{transactions.length} transactions found</CardDescription>
+                            <CardDescription>
+                                {transactions.length > 0
+                                    ? `Showing ${transactionPage * TRANSACTIONS_PAGE_SIZE + 1}–${transactionPage * TRANSACTIONS_PAGE_SIZE + transactions.length} transactions for ${monthOptions.find((month) => month.value === selectedMonth)?.label || selectedMonth}`
+                                    : `No transactions for ${monthOptions.find((month) => month.value === selectedMonth)?.label || selectedMonth}`}
+                            </CardDescription>
                         </CardHeader>
                         <CardContent>
                             <Table>
@@ -595,6 +600,13 @@ export default function BudgetPage() {
                                     </TableRow>
                                 </TableHeader>
                                 <TableBody>
+                                    {transactions.length === 0 ? (
+                                        <TableRow>
+                                            <TableCell className="py-10 text-center text-muted-foreground" colSpan={5}>
+                                                No spending transactions for this month and category.
+                                            </TableCell>
+                                        </TableRow>
+                                    ) : null}
                                     {transactions.map((transaction) => (
                                         <TableRow key={transaction._id}>
                                             <TableCell>{new Date(transaction.transaction_date).toLocaleDateString()}</TableCell>
@@ -611,6 +623,7 @@ export default function BudgetPage() {
                                                                 {category}
                                                             </SelectItem>
                                                         ))}
+                                                        <SelectItem value="Uncategorized">Uncategorized</SelectItem>
                                                     </SelectContent>
                                                 </Select>
                                             </TableCell>
@@ -623,6 +636,33 @@ export default function BudgetPage() {
                                     ))}
                                 </TableBody>
                             </Table>
+                            <div className="mt-4 flex items-center justify-between gap-3">
+                                <Button
+                                    variant="outline"
+                                    disabled={transactionPage === 0}
+                                    onClick={() => {
+                                        const page = transactionPage - 1;
+                                        setTransactionPage(page);
+                                        fetchTransactions(selectedCategory, selectedMonth, page);
+                                    }}
+                                >
+                                    <ChevronLeft className="mr-2 h-4 w-4" />
+                                    Previous
+                                </Button>
+                                <span className="text-sm text-muted-foreground">Page {transactionPage + 1}</span>
+                                <Button
+                                    variant="outline"
+                                    disabled={!hasMoreTransactions}
+                                    onClick={() => {
+                                        const page = transactionPage + 1;
+                                        setTransactionPage(page);
+                                        fetchTransactions(selectedCategory, selectedMonth, page);
+                                    }}
+                                >
+                                    Next
+                                    <ChevronRight className="ml-2 h-4 w-4" />
+                                </Button>
+                            </div>
                         </CardContent>
                     </Card>
                 </TabsContent>
@@ -632,9 +672,9 @@ export default function BudgetPage() {
                         <CardHeader>
                             <CardTitle className="flex items-center gap-2">
                                 <FileText className="h-5 w-5" />
-                                Uploaded OFX Files
+                                Imported statement files
                             </CardTitle>
-                            <CardDescription>Manage your uploaded OFX files</CardDescription>
+                            <CardDescription>Manage OFX, QFX, and CSV imports and their transactions.</CardDescription>
                         </CardHeader>
                         <CardContent>
                             <Table>
