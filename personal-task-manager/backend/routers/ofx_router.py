@@ -661,6 +661,7 @@ async def get_spending_summary(
     ).to_list()
 
     category_totals = {}
+    daily_totals_by_category = {}
     total_spent = 0.0
     total_income = 0.0
     pending_count = 0
@@ -683,6 +684,12 @@ async def get_spending_summary(
 
         category_totals[category]["amount"] += amount
         category_totals[category]["count"] += 1
+        day = tx.transaction_date.strftime("%Y-%m-%d")
+        day_categories = daily_totals_by_category.setdefault(day, {})
+        if category not in day_categories:
+            day_categories[category] = {"amount": 0, "count": 0}
+        day_categories[category]["amount"] += amount
+        day_categories[category]["count"] += 1
         total_spent += amount
 
     # Create category summaries
@@ -724,6 +731,13 @@ async def get_spending_summary(
         "net_cash_flow": round(total_income - total_spent, 2),
         "pending_count": pending_count,
         "categories": categories,
+        "daily_totals_by_category": {
+            day: {
+                category: {"amount": round(data["amount"], 2), "count": data["count"]}
+                for category, data in day_categories.items()
+            }
+            for day, day_categories in daily_totals_by_category.items()
+        },
     }
 
 

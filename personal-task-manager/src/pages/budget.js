@@ -15,8 +15,8 @@ import { AlertCircle, ArrowDown, ArrowUp, ArrowUpDown, ChevronDown, ChevronLeft,
 import { useToast } from "@/components/ui/use-toast";
 import CsvImportDialog from "@/components/budget/CsvImportDialog";
 import { BklitCategoryChart } from "@/components/financial-dashboard/BklitCategoryChart";
+import { BklitDailySpendingHeatmap } from "@/components/financial-dashboard/BklitDailySpendingHeatmap";
 import { BklitMonthlyTrendChart } from "@/components/financial-dashboard/BklitMonthlyTrendChart";
-import { BudgetTargetsEditor } from "@/components/financial-dashboard/BudgetTargetsEditor";
 import { FinancialStatusCards } from "@/components/financial-dashboard/FinancialStatusCards";
 import { getApiUrl } from "@/lib/api";
 
@@ -626,6 +626,10 @@ export default function BudgetPage() {
                         periodLabel={monthOptions.find((month) => month.value === selectedMonth)?.label || selectedMonth}
                         summary={spendingSummary}
                         targets={budgetTargets}
+                        targetCategories={[...SPENDING_CATEGORIES, "Uncategorized"]}
+                        targetEditorTitle={`${monthOptions.find((month) => month.value === selectedMonth)?.label || selectedMonth} budget targets`}
+                        isTargetsSaving={isTargetsSaving}
+                        onSaveTargets={saveBudgetTargets}
                     />
 
                     <Card>
@@ -696,12 +700,15 @@ export default function BudgetPage() {
                                 setActiveTab("transactions");
                             }}
                         />
-                        <BudgetTargetsEditor
-                            categories={[...SPENDING_CATEGORIES, "Uncategorized"]}
-                            isSaving={isTargetsSaving}
-                            onSave={saveBudgetTargets}
-                            targets={budgetTargets}
-                            title={`${monthOptions.find((month) => month.value === selectedMonth)?.label || selectedMonth} budget targets`}
+                        <BklitDailySpendingHeatmap
+                            categories={[
+                                ...SPENDING_CATEGORIES,
+                                "Uncategorized",
+                                ...(spendingSummary?.categories || []).map(({ category }) => category),
+                            ]}
+                            dailyTotalsByCategory={spendingSummary?.daily_totals_by_category}
+                            isLoading={isDashboardLoading}
+                            month={selectedMonth}
                         />
                     </div>
                 </TabsContent>

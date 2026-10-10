@@ -1320,3 +1320,53 @@
 2026-10-10 00:01:47,177 INFO routers.ofx_router 359 User testuser retrieving transactions
 2026-10-10 00:01:47,976 INFO routers.ofx_router 359 User testuser retrieving transactions
 2026-10-10 00:01:48,654 INFO routers.ofx_router 359 User testuser retrieving transactions
+2026-10-10 00:47:50,238 INFO main 35 Application Shuts down
+2026-10-10 00:47:54,332 INFO main 31 Application Starts...
+2026-10-10 00:47:54,432 INFO __name__ 43 database started
+2026-10-10 00:49:19,761 INFO routers.ofx_router 242 User testuser retrieving OFX files
+2026-10-10 00:49:19,771 INFO routers.ofx_router 359 User testuser retrieving transactions
+2026-10-10 00:49:19,781 INFO routers.ofx_router 650 User testuser retrieving spending summary
+2026-10-10 00:49:19,793 INFO routers.ofx_router 751 User testuser retrieving multi-month spending summary
+2026-10-10 00:49:20,508 WARN routers.user_router 35 Invalid token or token expired
+2026-10-10 00:49:20,525 WARN routers.user_router 35 Invalid token or token expired
+2026-10-10 00:49:20,525 WARN routers.user_router 35 Invalid token or token expired
+2026-10-10 00:49:20,527 WARN routers.user_router 35 Invalid token or token expired
+2026-10-10 00:49:20,527 WARN routers.user_router 35 Invalid token or token expired
+2026-10-10 00:49:20,528 WARN routers.user_router 35 Invalid token or token expired
+2026-10-10 00:49:40,332 INFO routers.ofx_router 650 User testuser retrieving spending summary
+2026-10-10 00:49:40,339 INFO routers.ofx_router 359 User testuser retrieving transactions
+2026-10-10 00:50:34,976 INFO routers.ofx_router 650 User testuser retrieving spending summary
+2026-10-10 00:50:34,981 INFO routers.ofx_router 359 User testuser retrieving transactions
+2026-10-10 00:50:36,949 INFO routers.ofx_router 650 User testuser retrieving spending summary
+2026-10-10 00:50:36,955 INFO routers.ofx_router 359 User testuser retrieving transactions
+2026-10-10 00:50:42,578 INFO routers.ofx_router 359 User testuser retrieving transactions
+2026-10-10 00:50:42,582 INFO routers.ofx_router 650 User testuser retrieving spending summary
+2026-10-10 00:52:35,894 INFO routers.ofx_router 650 User testuser retrieving spending summary
+2026-10-10 00:52:35,905 INFO routers.ofx_router 359 User testuser retrieving transactions
+2026-10-10 00:52:41,340 INFO routers.ofx_router 650 User testuser retrieving spending summary
+2026-10-10 00:52:41,348 INFO routers.ofx_router 359 User testuser retrieving transactions
+2026-10-10 00:52:50,681 INFO routers.ofx_router 359 User testuser retrieving transactions
+2026-10-10 00:52:50,683 INFO routers.ofx_router 650 User testuser retrieving spending summary
+2026-10-10 00:52:52,602 INFO routers.ofx_router 359 User testuser retrieving transactions
+2026-10-10 00:52:52,608 INFO routers.ofx_router 650 User testuser retrieving spending summary
+2026-10-10 00:53:03,725 INFO routers.ofx_router 650 User testuser retrieving spending summary
+2026-10-10 00:53:03,732 INFO routers.ofx_router 359 User testuser retrieving transactions
+2026-10-10 00:56:46,378 INFO routers.user_router 92 Sign-in attempt for username: testuser
+2026-10-10 00:56:47,424 INFO routers.user_router 109 User testuser logged in successfully
+2026-10-10 00:56:48,273 INFO routers.task_router 26 User testuser retrieving all tasks
+2026-10-10 00:56:48,440 INFO routers.task_router 43 User testuser retrieving tasks (level: task)
+2026-10-10 00:56:48,567 INFO routers.task_router 62 User testuser retrieving todos (level: todo)
+2026-10-10 00:56:48,791 INFO routers.task_router 81 User testuser retrieving gottados (level: gottado)
+2026-10-10 00:56:56,974 INFO routers.ofx_router 650 User testuser retrieving spending summary
+2026-10-10 00:56:56,985 INFO routers.ofx_router 242 User testuser retrieving OFX files
+2026-10-10 00:56:57,044 INFO routers.ofx_router 359 User testuser retrieving transactions
+2026-10-10 00:56:57,051 INFO routers.ofx_router 751 User testuser retrieving multi-month spending summary
+2026-10-10 01:03:19,938 INFO main 35 Application Shuts down
+2026-10-10 01:03:25,568 INFO main 31 Application Starts...
+2026-10-10 01:03:25,762 INFO __name__ 43 database started
+2026-10-10 01:10:33,122 WARN routers.user_router 35 Invalid token or token expired
+2026-10-10 01:10:33,133 WARN routers.user_router 35 Invalid token or token expired
+2026-10-10 01:10:33,142 WARN routers.user_router 35 Invalid token or token expired
+2026-10-10 01:10:33,145 WARN routers.user_router 35 Invalid token or token expired
+2026-10-10 01:10:33,146 WARN routers.user_router 35 Invalid token or token expired
+2026-10-10 01:10:33,149 WARN routers.user_router 35 Invalid token or token expired

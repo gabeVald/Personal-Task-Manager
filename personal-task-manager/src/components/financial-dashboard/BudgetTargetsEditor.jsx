@@ -80,12 +80,15 @@ export function BudgetTargetsEditor({
     targets = EMPTY_ARRAY,
     categories = EMPTY_ARRAY,
     onSave,
+    onCancel,
     isSaving = false,
     title = "Monthly budget targets",
+    embedded = false,
+    startEditing = false,
 }) {
     const idPrefix = useId();
     const [drafts, setDrafts] = useState(() => buildDrafts(targets));
-    const [isEditing, setIsEditing] = useState(false);
+    const [isEditing, setIsEditing] = useState(startEditing);
     const [selectedCategory, setSelectedCategory] = useState("");
     const [errors, setErrors] = useState({});
     const [saveError, setSaveError] = useState("");
@@ -125,6 +128,7 @@ export function BudgetTargetsEditor({
         setSaveError("");
         setSelectedCategory("");
         setIsEditing(false);
+        onCancel?.();
     }
 
     function updateAmount(category, value) {
@@ -210,22 +214,24 @@ export function BudgetTargetsEditor({
     }
 
     return (
-        <Card className="min-w-0">
-            <CardHeader className="flex flex-row items-start justify-between gap-4">
-                <div className="min-w-0">
-                    <CardTitle>{title}</CardTitle>
-                    <CardDescription className="mt-2">
-                        Set monthly spending limits for your overall budget and individual categories.
-                    </CardDescription>
-                </div>
-                {!isEditing ? (
-                    <Button aria-label="Edit monthly budget targets" className="shrink-0" onClick={beginEditing} type="button" variant="outline">
-                        <Pencil aria-hidden="true" className="mr-2 h-4 w-4" />
-                        Edit
-                    </Button>
-                ) : null}
-            </CardHeader>
-            <CardContent>
+        <Card className={embedded ? "gap-0 border-0 py-0 shadow-none" : "min-w-0"}>
+            {!embedded ? (
+                <CardHeader className="flex flex-row items-start justify-between gap-4">
+                    <div className="min-w-0">
+                        <CardTitle>{title}</CardTitle>
+                        <CardDescription className="mt-2">
+                            Set monthly spending limits for your overall budget and individual categories.
+                        </CardDescription>
+                    </div>
+                    {!isEditing ? (
+                        <Button aria-label="Edit monthly budget targets" className="shrink-0" onClick={beginEditing} type="button" variant="outline">
+                            <Pencil aria-hidden="true" className="mr-2 h-4 w-4" />
+                            Edit
+                        </Button>
+                    ) : null}
+                </CardHeader>
+            ) : null}
+            <CardContent className={embedded ? "px-0" : undefined}>
                 {isEditing ? (
                     <form className="space-y-6" noValidate onSubmit={handleSave}>
                         <div className="space-y-5">

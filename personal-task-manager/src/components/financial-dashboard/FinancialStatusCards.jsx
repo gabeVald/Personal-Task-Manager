@@ -1,21 +1,118 @@
 "use client";
 
+import { useState } from "react";
 import { ArrowDownRight, ArrowUpRight, CircleDollarSign, CreditCard, Target } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { BudgetTargetsEditor } from "./BudgetTargetsEditor";
 import { formatCurrency, toFiniteNumber } from "./formatters";
 
-function StatusCard({ title, icon: Icon, children, description, className = "" }) {
+function StatusCard({ title, icon: Icon, action, children, description, className = "" }) {
     return (
         <Card className={`min-w-0 ${className}`}>
             <CardHeader className="flex flex-row items-center justify-between gap-3 space-y-0 pb-2">
                 <CardTitle className="text-sm font-medium text-muted-foreground">{title}</CardTitle>
-                <Icon aria-hidden="true" className="h-4 w-4 shrink-0 text-muted-foreground" />
+                {action || <Icon aria-hidden="true" className="h-4 w-4 shrink-0 text-muted-foreground" />}
             </CardHeader>
             <CardContent>
                 {children}
                 {description ? <p className="mt-2 text-xs text-muted-foreground">{description}</p> : null}
             </CardContent>
         </Card>
+    );
+}
+
+function OverallTargetCard({
+    targetAmount,
+    spent,
+    progress,
+    remaining,
+    overBy,
+    isOverTarget,
+    targets,
+    categories,
+    isSaving,
+    onSave,
+    title,
+}) {
+    const [isEditorOpen, setIsEditorOpen] = useState(false);
+
+    return (
+        <Dialog open={isEditorOpen} onOpenChange={setIsEditorOpen}>
+            <StatusCard
+                action={(
+                    <DialogTrigger asChild>
+                        <Button aria-label="Edit monthly budget targets" size="icon" title="Edit monthly budget targets" type="button" variant="ghost">
+                            <Target aria-hidden="true" className="h-4 w-4 text-muted-foreground" />
+                        </Button>
+                    </DialogTrigger>
+                )}
+                title="Overall target"
+            >
+                {targetAmount !== null ? (
+                    <>
+                        <div className="flex flex-wrap items-baseline justify-between gap-x-2 gap-y-1">
+                            <p className="text-2xl font-semibold tabular-nums">
+                                {targetAmount === 0 ? "—" : `${Math.round(progress)}%`}
+                            </p>
+                            <p className="text-xs text-muted-foreground">
+                                {formatCurrency(spent)} of {formatCurrency(targetAmount)}
+                            </p>
+                        </div>
+                        {targetAmount > 0 ? (
+                            <div
+                                aria-label={`Overall target progress: ${Math.round(progress)} percent`}
+                                aria-valuemax={100}
+                                aria-valuemin={0}
+                                aria-valuenow={Math.round(progress)}
+                                className="mt-3 h-2 overflow-hidden rounded-full bg-muted"
+                                role="progressbar"
+                            >
+                                <div
+                                    className={`h-full rounded-full transition-[width] ${isOverTarget ? "bg-destructive" : "bg-primary"}`}
+                                    style={{ width: `${progress}%` }}
+                                />
+                            </div>
+                        ) : null}
+                        <p className={`mt-2 text-xs ${isOverTarget ? "font-medium text-destructive" : "text-muted-foreground"}`}>
+                            {targetAmount === 0
+                                ? spent > 0
+                                    ? `${formatCurrency(spent)} spent against a $0.00 target`
+                                    : "A $0.00 target is set for this period"
+                                : isOverTarget
+                                    ? `${formatCurrency(overBy)} over target`
+                                    : `${formatCurrency(remaining)} remaining`}
+                        </p>
+                    </>
+                ) : (
+                    <div className="pt-1">
+                        <p className="font-medium">No overall target set</p>
+                        <p className="mt-2 text-xs text-muted-foreground">
+                            Add a monthly Overall target to track progress and remaining budget.
+                        </p>
+                    </div>
+                )}
+            </StatusCard>
+            <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-2xl">
+                <DialogHeader>
+                    <DialogTitle>{title}</DialogTitle>
+                    <DialogDescription>Set monthly spending limits for your overall budget and individual categories.</DialogDescription>
+                </DialogHeader>
+                <BudgetTargetsEditor
+                    categories={categories}
+                    embedded
+                    isSaving={isSaving}
+                    onCancel={() => setIsEditorOpen(false)}
+                    onSave={typeof onSave === "function" ? async (nextTargets) => {
+                        await onSave(nextTargets);
+                        setIsEditorOpen(false);
+                    } : undefined}
+                    startEditing
+                    targets={targets}
+                />
+            </DialogContent>
+        </Dialog>
     );
 }
 
@@ -52,6 +149,10 @@ export function FinancialStatusCards({
     targets = [],
     periodLabel = "This month",
     isLoading = false,
+    targetCategories = [],
+    isTargetsSaving = false,
+    onSaveTargets,
+    targetEditorTitle = "Monthly budget targets",
 }) {
     if (isLoading) {
         return (
@@ -108,51 +209,19 @@ export function FinancialStatusCards({
                 </p>
             </StatusCard>
 
-            <StatusCard icon={Target} title="Overall target">
-                {overallTarget ? (
-                    <>
-                        <div className="flex flex-wrap items-baseline justify-between gap-x-2 gap-y-1">
-                            <p className="text-2xl font-semibold tabular-nums">
-                                {targetAmount === 0 ? "—" : `${Math.round(progress)}%`}
-                            </p>
-                            <p className="text-xs text-muted-foreground">
-                                {formatCurrency(spent)} of {formatCurrency(targetAmount)}
-                            </p>
-                        </div>
-                        {targetAmount > 0 ? (
-                            <div
-                                aria-label={`Overall target progress: ${Math.round(progress)} percent`}
-                                aria-valuemax={100}
-                                aria-valuemin={0}
-                                aria-valuenow={Math.round(progress)}
-                                className="mt-3 h-2 overflow-hidden rounded-full bg-muted"
-                                role="progressbar"
-                            >
-                                <div
-                                    className={`h-full rounded-full transition-[width] ${isOverTarget ? "bg-destructive" : "bg-primary"}`}
-                                    style={{ width: `${progress}%` }}
-                                />
-                            </div>
-                        ) : null}
-                        <p className={`mt-2 text-xs ${isOverTarget ? "font-medium text-destructive" : "text-muted-foreground"}`}>
-                            {targetAmount === 0
-                                ? spent > 0
-                                    ? `${formatCurrency(spent)} spent against a $0.00 target`
-                                    : "A $0.00 target is set for this period"
-                                : isOverTarget
-                                    ? `${formatCurrency(overBy)} over target`
-                                    : `${formatCurrency(remaining)} remaining`}
-                        </p>
-                    </>
-                ) : (
-                    <div className="pt-1">
-                        <p className="font-medium">No overall target set</p>
-                        <p className="mt-2 text-xs text-muted-foreground">
-                            Add a monthly Overall target to track progress and remaining budget.
-                        </p>
-                    </div>
-                )}
-            </StatusCard>
+            <OverallTargetCard
+                categories={targetCategories}
+                isOverTarget={isOverTarget}
+                isSaving={isTargetsSaving}
+                onSave={onSaveTargets}
+                overBy={overBy}
+                progress={progress}
+                remaining={remaining}
+                spent={spent}
+                targetAmount={targetAmount}
+                targets={targets}
+                title={targetEditorTitle}
+            />
         </section>
     );
 }
