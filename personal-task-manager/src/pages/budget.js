@@ -11,7 +11,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { AlertCircle, ChevronLeft, ChevronRight, FileText, Upload } from "lucide-react";
+import { AlertCircle, ArrowDown, ArrowUp, ArrowUpDown, ChevronDown, ChevronLeft, ChevronRight, FileText, Upload } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 import CsvImportDialog from "@/components/budget/CsvImportDialog";
 import { BklitCategoryChart } from "@/components/financial-dashboard/BklitCategoryChart";
@@ -23,6 +23,25 @@ import { getApiUrl } from "@/lib/api";
 // Spending categories
 const SPENDING_CATEGORIES = ["Food, Dining & Entertainment", "Auto, Commute & Travel", "Shopping", "Bills & Subscriptions", "Family & Pets", "Other Expenses", "Health & Personal Care"];
 const TRANSACTIONS_PAGE_SIZE = 50;
+function SortableTableHead({ label, sortKey, sort, onSort }) {
+    const isActive = sort.key === sortKey;
+    const direction = isActive ? sort.direction : null;
+    const Icon = direction === "asc" ? ArrowUp : direction === "desc" ? ArrowDown : ArrowUpDown;
+
+    return (
+        <TableHead aria-sort={direction === "asc" ? "ascending" : direction === "desc" ? "descending" : "none"}>
+            <button
+                type="button"
+                className="inline-flex items-center gap-1 rounded-sm p-0 text-inherit hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                aria-label={`Sort by ${label}${direction ? `, currently ${direction === "asc" ? "ascending" : "descending"}` : ""}`}
+                onClick={() => onSort(sortKey)}
+            >
+                {label}
+                <Icon className="h-3.5 w-3.5 text-muted-foreground" aria-hidden="true" />
+            </button>
+        </TableHead>
+    );
+}
 
 const CHART_COLORS = [
     "var(--chart-1)",
@@ -70,7 +89,9 @@ export default function BudgetPage() {
     const [ofxFiles, setOfxFiles] = useState([]);
     const [transactions, setTransactions] = useState([]);
     const [categoryRules, setCategoryRules] = useState([]);
+    const [categoryRulesExpanded, setCategoryRulesExpanded] = useState(false);
     const [transactionPage, setTransactionPage] = useState(0);
+    const [transactionSort, setTransactionSort] = useState({ key: "date", direction: "desc" });
     const [hasMoreTransactions, setHasMoreTransactions] = useState(false);
     const [spendingSummary, setSpendingSummary] = useState(null);
     const [multiMonthSummary, setMultiMonthSummary] = useState(null);
@@ -110,12 +131,14 @@ export default function BudgetPage() {
         }
     };
 
-    const fetchTransactions = async (category = "", month = selectedMonth, page = transactionPage) => {
+    const fetchTransactions = async (category = "", month = selectedMonth, page = transactionPage, sort = transactionSort) => {
         try {
             const params = new URLSearchParams();
             if (category) params.append("category", category);
             if (month) params.append("month", month);
             params.append("transaction_type", "debit");
+            params.append("sort_by", sort.key);
+            params.append("sort_order", sort.direction);
             params.append("skip", String(page * TRANSACTIONS_PAGE_SIZE));
             params.append("limit", String(TRANSACTIONS_PAGE_SIZE + 1));
 
@@ -128,6 +151,18 @@ export default function BudgetPage() {
             console.error("Error fetching transactions:", error);
             toast({ title: "Error", description: "Failed to load transactions", variant: "destructive" });
         }
+    };
+
+    const sortTransactions = (key) => {
+        const nextSort = {
+            key,
+            direction: transactionSort.key === key
+                ? transactionSort.direction === "asc" ? "desc" : "asc"
+                : key === "date" ? "desc" : "asc",
+        };
+        setTransactionSort(nextSort);
+        setTransactionPage(0);
+        fetchTransactions(selectedCategory, selectedMonth, 0, nextSort);
     };
 
     const fetchSpendingSummary = async (month = selectedMonth) => {
@@ -450,6 +485,15 @@ export default function BudgetPage() {
 
     const monthOptions = generateMonthOptions();
 
+    const selectDashboardMonth = (month) => {
+        setSelectedMonth(month);
+        setSelectedCategory("");
+        setTransactionPage(0);
+        fetchSpendingSummary(month);
+        fetchBudgetTargets(month);
+        fetchTransactions("", month, 0);
+    };
+
     return (
         <div className="container mx-auto p-6 space-y-6">
             <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
@@ -459,9 +503,6 @@ export default function BudgetPage() {
                     <p className="mt-1 text-muted-foreground">Understand cash flow, spending trends, and category budgets.</p>
                 </div>
                 <div className="flex flex-wrap items-center gap-2">
-                    <Button variant="outline" onClick={() => router.push("/visualization-demos")}>
-                        Compare chart demos
-                    </Button>
                     <Button variant="outline" onClick={() => setCsvImportOpen(true)}>
                         <Upload className="mr-2 h-4 w-4" />
                         Import CSV
@@ -566,14 +607,7 @@ export default function BudgetPage() {
                             <Label htmlFor="dashboard-month" className="shrink-0">Month</Label>
                             <Select
                                 value={selectedMonth}
-                                 onValueChange={(value) => {
-                                    setSelectedMonth(value);
-                                    setSelectedCategory("");
-                                    setTransactionPage(0);
-                                    fetchSpendingSummary(value);
-                                    fetchBudgetTargets(value);
-                                    fetchTransactions("", value, 0);
-                                }}
+                                onValueChange={selectDashboardMonth}
                             >
                                 <SelectTrigger id="dashboard-month" className="w-48">
                                     <SelectValue placeholder="Select month" />
@@ -646,10 +680,12 @@ export default function BudgetPage() {
                             }))}
                         description={`${formatMonthLabel(startMonth)} – ${formatMonthLabel(endMonth)} · stacked by spending category`}
                         isLoading={isTrendLoading}
+                        onMonthClick={selectDashboardMonth}
                     />
 
                     <div className="grid gap-6 xl:grid-cols-2">
                         <BklitCategoryChart
+                            categoryColors={CHART_CATEGORIES}
                             categories={spendingSummary?.categories || []}
                             isLoading={isDashboardLoading}
                             targets={budgetTargets}
@@ -672,16 +708,33 @@ export default function BudgetPage() {
 
                 <TabsContent value="transactions" className="space-y-4">
                     <Card>
-                        <CardHeader className="flex flex-row items-start justify-between gap-4 space-y-0">
-                            <div>
-                                <CardTitle>Automatic category defaults</CardTitle>
-                                <CardDescription>Rules categorize future imports when the merchant name contains the matching text.</CardDescription>
-                            </div>
+                        <CardHeader className="flex flex-row items-center justify-between gap-4 space-y-0">
+                            <button
+                                type="button"
+                                className="flex min-w-0 flex-1 items-start gap-3 rounded-md text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                                aria-expanded={categoryRulesExpanded}
+                                aria-controls="automatic-category-defaults"
+                                onClick={() => setCategoryRulesExpanded((expanded) => !expanded)}
+                            >
+                                <ChevronDown
+                                    className={`mt-0.5 h-4 w-4 shrink-0 text-muted-foreground transition-transform ${categoryRulesExpanded ? "" : "-rotate-90"}`}
+                                    aria-hidden="true"
+                                />
+                                <span className="min-w-0">
+                                    <span className="flex items-center gap-2 font-semibold leading-none">
+                                        Automatic category defaults
+                                        <span className="rounded-full bg-muted px-2 py-0.5 text-xs font-normal text-muted-foreground" aria-label={`${categoryRules.length} defaults`}>
+                                            {categoryRules.length}
+                                        </span>
+                                    </span>
+                                    <span className="mt-2 block text-sm text-muted-foreground">Rules categorize future imports when the merchant name contains the matching text.</span>
+                                </span>
+                            </button>
                             <Button variant="outline" onClick={() => openCategoryRuleDialog()}>
                                 Add default
                             </Button>
                         </CardHeader>
-                        <CardContent>
+                        <CardContent id="automatic-category-defaults" hidden={!categoryRulesExpanded} className="space-y-2">
                             {categoryRules.length === 0 ? (
                                 <p className="text-sm text-muted-foreground">No defaults yet. Use “Set default” on a transaction or add one here.</p>
                             ) : (
@@ -742,9 +795,24 @@ export default function BudgetPage() {
                             <Table>
                                 <TableHeader>
                                     <TableRow>
-                                        <TableHead>Date</TableHead>
-                                        <TableHead>Merchant</TableHead>
-                                        <TableHead>Amount</TableHead>
+                                        <SortableTableHead
+                                            label="Date"
+                                            sortKey="date"
+                                            sort={transactionSort}
+                                            onSort={sortTransactions}
+                                        />
+                                        <SortableTableHead
+                                            label="Merchant"
+                                            sortKey="merchant"
+                                            sort={transactionSort}
+                                            onSort={sortTransactions}
+                                        />
+                                        <SortableTableHead
+                                            label="Amount"
+                                            sortKey="amount"
+                                            sort={transactionSort}
+                                            onSort={sortTransactions}
+                                        />
                                         <TableHead>Category</TableHead>
                                         <TableHead>Actions</TableHead>
                                     </TableRow>

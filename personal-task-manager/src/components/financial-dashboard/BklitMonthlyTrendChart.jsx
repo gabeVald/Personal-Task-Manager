@@ -70,6 +70,7 @@ export function BklitMonthlyTrendChart({
     isLoading = false,
     title = "Monthly spending trend",
     description = "Spending by category over time",
+    onMonthClick,
 }) {
     const rows = Array.isArray(data) ? data : [];
     const series = normalizeSeries(categories, rows);
@@ -114,6 +115,7 @@ export function BklitMonthlyTrendChart({
                             className="h-[280px] w-full sm:h-[320px]"
                             data={chartData}
                             margin={{ top: 28, right: 12, bottom: 42, left: 12 }}
+                            onPointClick={onMonthClick ? (point) => onMonthClick(point.month) : undefined}
                             status={isLoading ? "loading" : "ready"}
                             stacked
                             xDataKey="label"

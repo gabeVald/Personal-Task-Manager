@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import Annotated, Optional
+from typing import Annotated, Literal, Optional
 from beanie import PydanticObjectId
 from fastapi import (
     APIRouter,
@@ -352,6 +352,8 @@ async def get_transactions(
     end_date: Optional[datetime] = None,
     month: Optional[str] = None,
     transaction_type: Optional[str] = "debit",  # Default to debit (spending)
+    sort_by: Literal["date", "merchant", "amount"] = "date",
+    sort_order: Literal["asc", "desc"] = "desc",
 ):
     """Get transactions for the current user with optional filtering"""
     logger.info(f"User {current_user.username} retrieving transactions")
@@ -381,9 +383,21 @@ async def get_transactions(
             date_query["$lte"] = end_date
         query["transaction_date"] = date_query
 
+    sort_fields = {
+        "date": Transaction.transaction_date,
+        "merchant": Transaction.merchant_payee,
+        "amount": Transaction.amount,
+    }
+    sort_direction = 1 if sort_order == "asc" else -1
+    # Debits are stored as negative values but displayed as positive spending amounts.
+    if sort_by == "amount" and transaction_type == "debit":
+        sort_direction *= -1
+    sort_field = sort_fields[sort_by]
+    sort_expression = sort_field if sort_direction == 1 else -sort_field
+
     transactions = (
         await Transaction.find(query)
-        .sort(-Transaction.transaction_date)
+        .sort(sort_expression)
         .skip(skip)
         .limit(limit)
         .to_list()

@@ -100,6 +100,7 @@ const ChartCore = memo(function ChartCore({
   squareSnap,
   children,
   containerRef,
+  onPointClick,
   onPhaseChange,
   status
 }) {
@@ -208,6 +209,10 @@ const ChartCore = memo(function ChartCore({
       data,
       innerHeight,
       resolveDomain: (dataKeys) => {
+        if (stacked) {
+          return [0, maxValue * 1.1];
+        }
+
         let max = 0;
         for (const d of data) {
           for (const key of dataKeys) {
@@ -220,7 +225,7 @@ const ChartCore = memo(function ChartCore({
         return [0, (max || 100) * 1.1];
       },
     });
-  }, [data, innerHeight, isHorizontal, lines, valueScale]);
+  }, [data, innerHeight, isHorizontal, lines, maxValue, stacked, valueScale]);
 
   const primaryYScale = getPrimaryYScale(yScales, valueScale);
 
@@ -455,6 +460,34 @@ const ChartCore = memo(function ChartCore({
     clearTooltip();
   }, [clearTooltip]);
 
+  const handleClick = useCallback(
+    (event) => {
+      const point = localPoint(event);
+      if (!point) {
+        return;
+      }
+
+      const pos = isHorizontal ? point.y - margin.top : point.x - margin.left;
+      const axisLength = isHorizontal ? innerHeight : innerWidth;
+      if (pos < 0 || pos >= axisLength) {
+        return;
+      }
+
+      if (isHorizontal ? point.x < margin.left || point.x >= width - margin.right : point.y < margin.top) {
+        return;
+      }
+
+      const bandIndex = Math.floor(pos / columnWidth);
+      const clampedIndex = Math.max(0, Math.min(data.length - 1, bandIndex));
+      const datum = data[clampedIndex];
+
+      if (datum) {
+        onPointClick?.(datum, clampedIndex);
+      }
+    },
+    [columnWidth, data, innerHeight, innerWidth, isHorizontal, margin.left, margin.right, margin.top, onPointClick, width]
+  );
+
   const canInteract = isLoaded;
 
   // Separate children into defs, pre-overlay, and post-overlay
@@ -525,6 +558,7 @@ const ChartCore = memo(function ChartCore({
     stacked,
     stackOffsets,
     squareSnap,
+    isPointClickable: Boolean(onPointClick),
   };
 
   return (
@@ -533,6 +567,8 @@ const ChartCore = memo(function ChartCore({
         aria-hidden="true"
         className="overflow-visible"
         height={height}
+        onClick={canInteract && onPointClick ? handleClick : undefined}
+        style={{ cursor: canInteract && onPointClick ? "pointer" : undefined }}
         width={width}
       >
         {/* Gradient and pattern definitions */}
@@ -544,7 +580,7 @@ const ChartCore = memo(function ChartCore({
         <g
           onMouseLeave={canInteract ? handleMouseLeave : undefined}
           onMouseMove={canInteract ? handleMouseMove : undefined}
-          style={{ cursor: canInteract ? "crosshair" : "default" }}
+          style={{ cursor: canInteract ? (onPointClick ? "pointer" : "crosshair") : "default" }}
           transform={`translate(${margin.left},${margin.top})`}
         >
           {/* Background rect for mouse event detection */}
@@ -593,6 +629,7 @@ export function BarChart({
   stackGap = 0,
   squareSnap,
   children,
+  onPointClick,
   onPhaseChange,
   status = "ready"
 }) {
@@ -617,6 +654,7 @@ export function BarChart({
             enterTransition={enterTransition}
             height={height}
             margin={margin}
+            onPointClick={onPointClick}
             onPhaseChange={onPhaseChange}
             orientation={orientation}
             revealSignature={revealSignature}

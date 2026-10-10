@@ -2,9 +2,9 @@
 
 import { ArrowRight, ChartColumnIncreasing } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Bar } from "@/components/charts/bar";
 import { BarChart } from "@/components/charts/bar-chart";
 import { BarXAxis } from "@/components/charts/bar-x-axis";
-import { BarColumnTrack, BarSquares } from "@/components/charts/bar-squares";
 import { Grid } from "@/components/charts/grid";
 import { ChartTooltip } from "@/components/charts/tooltip";
 import { TooltipContent } from "@/components/charts/tooltip/tooltip-content";
@@ -20,7 +20,7 @@ function shortenLabel(label, maxLength = 10) {
 
 function CategoryTooltip({ point }) {
     const rows = [
-        { label: "Spending", value: formatCurrency(point.total_amount), color: "var(--chart-1)" },
+        { label: "Spending", value: formatCurrency(point.total_amount), color: point.chartColor || "var(--chart-1)" },
         {
             label: "Transactions",
             value: `${Math.max(0, Math.round(toFiniteNumber(point.transaction_count))).toLocaleString("en-US")}`,
@@ -54,12 +54,18 @@ function LoadingContent() {
 
 export function BklitCategoryChart({
     categories = [],
+    categoryColors = [],
     targets = [],
     onCategoryClick,
     isLoading = false,
     title = "Spending by category",
     description = "Highest-spending categories this period",
 }) {
+    const colorByCategory = new Map(
+        (Array.isArray(categoryColors) ? categoryColors : [])
+            .filter((category) => typeof category?.key === "string" && typeof category?.color === "string")
+            .map((category) => [category.key.trim().toLowerCase(), category.color])
+    );
     const targetByCategory = new Map(
         (Array.isArray(targets) ? targets : [])
             .filter((target) => typeof target?.category === "string" && target.category.trim().toLowerCase() !== "overall")
@@ -79,6 +85,7 @@ export function BklitCategoryChart({
     const chartData = rankedCategories.slice(0, CHART_CATEGORY_LIMIT).map((category, index) => ({
         ...category,
         label: `${index + 1} · ${shortenLabel(category.category, 5)}`,
+        chartColor: colorByCategory.get(category.category.toLowerCase()) || "var(--chart-1)",
     }));
 
     return (
@@ -116,8 +123,7 @@ export function BklitCategoryChart({
                                 xDataKey="label"
                             >
                                 <Grid horizontal fadeHorizontal={false} strokeDasharray="3,4" />
-                                <BarColumnTrack fill="var(--muted)" opacity={0.5} squareFit />
-                                <BarSquares animate dataKey="total_amount" fill="var(--chart-1)" squareFit />
+                                <Bar animate dataKey="total_amount" fillDataKey="chartColor" />
                                 <BarXAxis maxLabels={CHART_CATEGORY_LIMIT} showAllLabels />
                                 <ChartTooltip
                                     content={({ point }) => <CategoryTooltip point={point} />}
@@ -145,7 +151,11 @@ export function BklitCategoryChart({
                                                 <span className="w-5 shrink-0 text-right text-xs text-muted-foreground tabular-nums">
                                                     {index + 1}
                                                 </span>
-                                                <span aria-hidden="true" className="h-2.5 w-2.5 shrink-0 rounded-full bg-[var(--chart-1)]" />
+                                                <span
+                                                    aria-hidden="true"
+                                                    className="h-2.5 w-2.5 shrink-0 rounded-full"
+                                                    style={{ backgroundColor: colorByCategory.get(category.category.toLowerCase()) || "var(--chart-1)" }}
+                                                />
                                                 <span className="min-w-0 truncate font-medium">{category.category}</span>
                                             </span>
                                             <span className="flex shrink-0 items-center gap-2">

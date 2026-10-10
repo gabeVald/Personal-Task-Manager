@@ -103,6 +103,7 @@ const BarInner = memo(function BarInner({
   dataKey,
   yAxisId,
   fill = chartCssVars.linePrimary,
+  fillDataKey,
   lineCap = "round",
   animate = true,
   animationType = "grow",
@@ -127,6 +128,7 @@ const BarInner = memo(function BarInner({
     orientation,
     stacked,
     stackOffsets,
+    isPointClickable,
     animationDuration,
     enterTransition,
     revealEpoch = 0,
@@ -190,12 +192,16 @@ const BarInner = memo(function BarInner({
   }, [lineCap, barWidth, perspective]);
 
   return (
-    <g className={`bar-series-${uniqueId}`}>
+    <g className={`bar-series-${uniqueId}`} style={{ cursor: isPointClickable ? "pointer" : "default" }}>
       {data.map((d, i) => {
         const value = d[dataKey];
         if (typeof value !== "number") {
           return null;
         }
+        const barFill =
+          typeof fillDataKey === "string" && typeof d[fillDataKey] === "string"
+            ? d[fillDataKey]
+            : fill;
 
         const categoryValue = barXAccessor(d);
         const bandPos = barScale(categoryValue) ?? 0;
@@ -325,7 +331,7 @@ const BarInner = memo(function BarInner({
               animationType={animationType}
               enterTransition={enterTransition}
               fadedOpacity={fadedOpacity}
-              fill={fill}
+              fill={barFill}
               height={barHeight}
               index={i}
               innerHeight={innerHeight}
@@ -346,14 +352,13 @@ const BarInner = memo(function BarInner({
         // Static bar after animation completes
         return (
           <rect
-            fill={fill}
+            fill={barFill}
             height={barHeight}
             key={barKey}
             opacity={isFaded ? fadedOpacity : 1}
             rx={effectiveRx}
             ry={effectiveRy}
             style={{
-              cursor: "default",
               transition: "opacity 0.15s ease-in-out",
             }}
             width={barW}
